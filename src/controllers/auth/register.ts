@@ -13,7 +13,8 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     });
 
     if (existedUser) {
-        throw new ApiError(400, "User with email or username already exists", []);
+        return res.status(200).json({ message: "User already exist" })
+        //throw new ApiError(400, "User with email or username already exists", []);
     }
 
     const user = await User.create({

@@ -5,6 +5,7 @@ import {
     generateRefreshToken,
     generateTemperaryToken,
 } from "../utils/authHelper";
+import { defaultMaxListeners } from "events";
 
 export enum UserRoles {
     ADMIN = "ADMIN",
@@ -18,17 +19,22 @@ interface userAvatar {
 
 export interface IUser extends Document {
     _id: Types.ObjectId;
+    googleId: string
     username: string;
     email: string;
     avatar: userAvatar;
+    bio: string;
     role: UserRoles;
     password: string;
     otp: number
     sentFriendReq: mongoose.Types.ObjectId[];
     incommingFriendReq: mongoose.Types.ObjectId[];
+    friends: mongoose.Types.ObjectId[]
     refreshToken?: string;
     forgotPasswordToken?: string;
     forgotPasswordExpiry: Date;
+    status: "online" | "offline";
+    lastSeen?: Date;
 
     isPasswordCorrect(password: string): Promise<boolean>;
     generateAccessToken(): string;
@@ -55,6 +61,10 @@ const userSchemaFields = {
         lowercase: true,
         trim: true,
     },
+    googleId: {
+        type: String,
+        default: null
+    },
     avatar: {
         type: {
             url: String,
@@ -62,6 +72,10 @@ const userSchemaFields = {
         default: {
             url: `https://via.placeholder.com/200x200.png`,
         },
+    },
+    bio: {
+        type: String,
+        default: "Hi, i am using Tawk!"
     },
     role: {
         type: String,
@@ -77,6 +91,14 @@ const userSchemaFields = {
         required: [true, "password is required"],
         select: false,
     },
+    status: {
+        type: String,
+        enum: ["online", "offline"],
+        default: "offline"
+    },
+    lastSeen: {
+        type: Date
+    },
     sentFriendReq: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -88,6 +110,12 @@ const userSchemaFields = {
             type: mongoose.Schema.Types.ObjectId,
             ref: "FriendRequest",
         },
+    ],
+    friends: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: 'User'
+        }
     ],
 
     refreshToken: String,
