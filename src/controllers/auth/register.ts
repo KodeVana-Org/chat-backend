@@ -7,7 +7,6 @@ import { generateAccessAndRefreshToken } from "../../utils/generateAccessAndRefr
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
     const { email, username, password } = req.body;
-    console.log(email, username, password);
 
     const existedUser = await User.findOne({
         $or: [{ username }, { email }],
@@ -23,9 +22,30 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
         username,
     });
 
-    return res
-        .status(201)
-        .json(new ApiResponse(200, { user }, "User registered successfully"));
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+        user._id,
+    );
+    const loggedInUser = await User.findById(user._id).select(
+        "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+    );
+    try {
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken) // set the access token in the cookie
+            .cookie("refreshToken", refreshToken) // set the refresh token in the cookie
+            .json(
+                new ApiResponse(
+                    200,
+                    { user: loggedInUser, accessToken, refreshToken }, // send access and refresh token in response if client decides to save them by themselves
+                    "User registerd  successfully",
+                ),
+            );
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Error while login",
+        });
+    }
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
