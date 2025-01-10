@@ -5,7 +5,6 @@ import env from "../config/dotenvConfig";
 export const USER_TEMPORARY_TOKEN_EXPIRY = 20 * 60 * 1000; // 20 minutes
 
 export function generateAccessToken(user: IUser): string {
-    console.log("this is running")
     return jwt.sign(
         {
             _id: user._id,

@@ -14,6 +14,11 @@ interface envVars {
 
     MAIL_EMAIL: string
     MAIL_PASSWORD: string
+
+    CLOUDINARY_CLOUD_NAME: string
+    CLOUDINARY_API_KEY: string
+    CLOUDINARY_API_SECRET: string
+
 }
 
 //function to get and parse env variable
@@ -44,6 +49,9 @@ const env: envVars = {
     ORIGIN: getEnvVar("ORIGIN") as string,
     MAIL_EMAIL: getEnvVar("MAIL_EMAIL") as string,
     MAIL_PASSWORD: getEnvVar("MAIL_PASSWORD") as string,
+    CLOUDINARY_CLOUD_NAME: getEnvVar("CLOUDINARY_CLOUD_NAME") as string,
+    CLOUDINARY_API_SECRET: getEnvVar("CLOUDINARY_API_SECRET") as string,
+    CLOUDINARY_API_KEY: getEnvVar("CLOUDINARY_API_KEY") as string
 };
 
 export default env;
