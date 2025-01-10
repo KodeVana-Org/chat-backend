@@ -9,7 +9,8 @@ import { sendOtp } from "../../services/sendEmail"
 const forgot_password = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     try {
         // Extract the user ID from request parameters
-        const { userid } = req.params;
+        const { userid } = req.body;
+
 
         // Validate user ID
         if (!userid) {
