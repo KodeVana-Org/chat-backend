@@ -12,7 +12,6 @@ const verify_otp = asyncHandler(async (req: Request, res: Response): Promise<Res
         console.log(email, otp)
         //check email is valid or not
         const user = await User.findOne({ email })
-        console.log(user)
 
         //user not exist
         if (!user) {
@@ -23,9 +22,7 @@ const verify_otp = asyncHandler(async (req: Request, res: Response): Promise<Res
         if (user.otp !== otp) {
             throw new ApiError(404, "Invalid otp")
         }
-        user.otp = 17653
-        await user.save()
-
+        console.log("if im here opt verifiled: ")
         return res
             .status(200)
             .json(new ApiResponse(200, {}, "otp verified successfully"))
