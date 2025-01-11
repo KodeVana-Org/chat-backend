@@ -14,7 +14,7 @@ const startServer = () => {
 (async () => {
     try {
         //connect to redis
-        await connectRedis()
+        //await connectRedis()
 
         //connect to mongodb
         await connectToDatabase()

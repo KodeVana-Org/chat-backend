@@ -20,7 +20,7 @@ const router = Router();
 // public-route
 router.route("/register").post(userRegisterValidator(), validate, registerUser);
 router.route("/login").post(userLoginValidator(), validate, loginUser);
-router.route("/forgot-password/:userid").post(forgot_password);
+router.route("/forgot-password").post(forgot_password);
 router.route("/verify-otp").post(verify_otp);
 router.route("/new-password").post(new_password);
 router.route("/google").post(auth_google)

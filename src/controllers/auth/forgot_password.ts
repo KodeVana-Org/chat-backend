@@ -9,16 +9,16 @@ import { sendOtp } from "../../services/sendEmail"
 const forgot_password = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     try {
         // Extract the user ID from request parameters
-        const { userid } = req.body;
+        const { email } = req.body;
 
 
         // Validate user ID
-        if (!userid) {
+        if (!email) {
             throw new ApiError(400, "User ID is required");
         }
 
         // Find the user by ID and include the email field
-        const user = await User.findById(userid).select("+email");
+        const user = await User.findOne({ email }).select("+email");
         if (!user) {
             throw new ApiError(404, "User not found");
         }
