@@ -8,11 +8,17 @@ import { upload } from "../config/multerConfig";
 import { setUserOffline, setUserOnline } from "../middlewares/userStatus.middware";
 import { ApiResponse } from "../utils/ApiResponse";
 import { redisClient } from "../config/redisConfig";
+import { searchAllUser } from "../controllers/user/searchUser";
 //import { createClient } from "redis";
 //const redisClient = createClient()
 
 
 const router = Router();
+
+
+//search user
+router.route("/search").get(searchAllUser);
+
 
 router.route("/all-users").get(getAllUser);
 router.route("/me").get(me);

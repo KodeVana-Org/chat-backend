@@ -8,7 +8,7 @@ const verify_otp = asyncHandler(async (req: Request, res: Response): Promise<Res
     try {
 
         //get email and opt
-        const { email, otp } = req.body;
+        let { email, otp } = req.body;
         console.log(email, otp)
         //check email is valid or not
         const user = await User.findOne({ email })
