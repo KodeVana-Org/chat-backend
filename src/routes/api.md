@@ -73,6 +73,17 @@
 * see  freiends
     --> /api/v1/friend/friends/677d5bebc511fdf6b110a6e0
 
+## conversation Route
+   * Create Conversation :=> Body: 
+   POST:-> /api/v1/conversation/:userId
+
+   * Get all conversation
+   GET:-> /api/v1/conversation/con
+
+   * Rename group :=> 
+            Take the userId {who will change group name in params}
+            Body: newName, conversationId
+    PATCH :=> /api/v1/conversation/rename-group
 
 ## lets try to set user is not or offline
     <<-+ added two extra field name status & lastseen ++>

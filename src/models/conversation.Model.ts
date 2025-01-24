@@ -8,7 +8,7 @@ interface Iparticipant {
 }
 
 //conversation interface
-interface IConversation extends Document {
+export interface IConversation extends Document {
     participants: Iparticipant[]; //List of participants
     isGroupChat: boolean; // false for one to one chat
     groupName?: string;
