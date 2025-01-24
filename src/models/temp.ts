@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, model, Document } from "mongoose";
 
 //Define interface for document
 export interface ITermpEmail extends Document {
