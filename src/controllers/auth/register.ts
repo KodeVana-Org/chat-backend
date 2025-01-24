@@ -4,9 +4,58 @@ import { asyncHandler } from "../../utils/asyncHandler";
 import { ApiError } from "../../utils/ApiError";
 import { ApiResponse } from "../../utils/ApiResponse";
 import { generateAccessAndRefreshToken } from "../../utils/generateAccessAndRefreshToken";
+import { TempEmail } from "../../models/temp"
+import { generate_otp } from "../../services/generate_otp";
+
+// first lets veify the user  throught the email if ther email is valid then we will register 
+const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        const emailExist = await TempEmail.findOne({ email })
+
+        //generate four digit otp
+        const otp = generate_otp(4)
+
+        //if emial exist then update the opt and send
+        if (emailExist) {
+            emailExist.otp = otp
+            await emailExist.save()
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(
+                        200,
+                        { otp },
+                        "OTP sended successfully",
+                    ),
+                );
+        }
+
+        //if email not exist that mean new user ,
+        // new user  then save the mail and save the otp and send
+        const newEmail = await TempEmail.create({ email, otp })
+        await newEmail.save()
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { otp },
+                    "OTP sended successfully",
+                ),
+            );
+
+    } catch (error) {
+        console.error("Eror while seding verification email", error)
+    }
+
+})
+
+
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
-    const { email, username, password } = req.body;
+    const { email, username, password, otp } = req.body;
 
     const existedUser = await User.findOne({
         $or: [{ username }, { email }],
@@ -16,6 +65,25 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
         return res.status(200).json({ message: "User already exist" })
         //throw new ApiError(400, "User with email or username already exists", []);
     }
+
+    // lets verify otp here first
+    const tempEmail_exist = await TempEmail.findOne({ email })
+    if (!tempEmail_exist) {
+        return res.status(404).json({
+            message: "Email and OTP not exist"
+        })
+    }
+
+    if (tempEmail_exist) {
+        if (!tempEmail_exist.otp === otp) {
+            return res.status(401).json({
+                message: "OTP is not matched"
+            })
+        }
+        return
+    }
+
+
 
     const user = await User.create({
         email,
@@ -48,6 +116,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
         });
     }
 });
+
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -115,4 +184,4 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User logged out"));
 });
 
-export { registerUser, loginUser, logoutUser };
+export { registerUser, loginUser, logoutUser, verifyEmail };

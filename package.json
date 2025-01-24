@@ -22,7 +22,7 @@
     "build": "tsc",
     "prestart": "npm run build",
     "start": "NODE_ENV=production node build/index.js",
-    "dev": "NODE_ENV=development nodemon --exec ts-node src/index.ts"
+    "dev": "cross-env NODE_ENV=development NODE_OPTIONS='--no-warnings' nodemon -x ts-node src/index.ts"
   },
   "keywords": [
     "node",
@@ -36,6 +36,7 @@
     "bcrypt": "^5.1.1",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
