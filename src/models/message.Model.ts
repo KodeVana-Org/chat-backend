@@ -1,49 +1,104 @@
+/* 
+  ** message have
+    * content
+    * sender
+    * media
+    * audio
+    * document
+    * giphyUrl
+    * date
+    * type => Media | Text | Document | Audio | Giphy
+*/
+
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-interface IAttachment {
+/**
+ * Document Schema for file attachments.
+ * This schema represents documents (e.g., PDFs, Word files) that can be sent within messages.
+ */
+
+interface DocumentFile {
     url: string;
-    localPath: string;
+    name: string;
+    size: number;
 }
 
-//There will be -> receiver fields right ?
-interface IChatMessage extends Document {
-    sender: mongoose.Types.ObjectId;
-    content: string;
-    attachments: IAttachment[];
-    chat: mongoose.Types.ObjectId;
+
+
+/**
+ * There will be -> receiver fields right ? no only sender i gues
+ * Message Schema
+ * Defines the structure of a message document in the database.
+ */
+
+interface IMessage extends Document {
+    sender: mongoose.Types.ObjectId;  //Refernce to the User model
+    converstionId: mongoose.Types.ObjectId // Reference to the conversation model
+    content?: string; //Optional text content
+    media?: Array<{
+        type: "image" | "video" // Media type
+    }>;
+    audioUrl?: string;
+    giphyUrl?: string;
+    document?: DocumentFile;
+    type: "Media" | "Text" | "Document" | "Giphy" | "Audio" //Message type
+    createdAt?: Date;
+    updatedAt?: Date;
+
 }
 
-const attachmentSchema = new Schema<IAttachment>({
+//Document Schema for a file
+const documentSchema = new Schema<DocumentFile>({
     url: { type: String, required: true },
-    localPath: { type: String, required: true },
-});
+    name: { type: String, required: true },
+    size: { type: Number, required: true },
+})
 
-const chatMessageSchema = new Schema<IChatMessage>(
+
+const MessageSchema = new Schema<IMessage>(
     {
         sender: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
+        converstionId: {
+            type: Schema.Types.ObjectId,
+            ref: "Conversation",
+            required: true
+        },
+        media: [
+            {
+                type: {
+                    type: String,
+                    enum: ["image", "video"]
+                }
+            }
+        ],
+        audioUrl: {
+            type: String
+        },
+        giphyUrl: {
+            type: String
+        },
+        type: {
+            type: String,
+            enum: ["Media", "Text", "Document", "Giphy", "Audio"]
+        },
+        document: {
+            type: documentSchema
+        },
+
+        // NOTE: i dont know it is necesarry or not just puted here 
         content: {
             type: String,
-            required: true,
-        },
-        //might be the cloudinary url ,TODO:todo
-        attachments: {
-            type: [attachmentSchema],
-            default: [],
-        },
-        chat: {
-            type: Schema.Types.ObjectId,
-            ref: "Chat",
             required: true,
         },
     },
     { timestamps: true },
 );
 
-export const ChatMessage: Model<IChatMessage> = mongoose.model<IChatMessage>(
-    "ChatMessage",
-    chatMessageSchema,
+export const Message: Model<IMessage> = mongoose.model<IMessage>(
+    "Message",
+    MessageSchema,
 );
