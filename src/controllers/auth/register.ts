@@ -7,10 +7,25 @@ import { generateAccessAndRefreshToken } from "../../utils/generateAccessAndRefr
 import { TempEmail } from "../../models/temp"
 import { generate_otp } from "../../services/generate_otp";
 
-// first lets veify the user  throught the email if ther email is valid then we will register 
+/*
+   first lets veify the user  throught the email if ther email is valid then we will register 
+   I think there need to be also check if the user is already regiusterd or not
+*/
 const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
     try {
         const { email } = req.body;
+
+        /*
+         * Lets check if hte email is already registerd
+        */
+
+        const user_already_registerd = await User.findById(email)
+        if (user_already_registerd) {
+            return res.status(400).json({
+                message: "User already registerd"
+            })
+        }
+
         const emailExist = await TempEmail.findOne({ email })
 
         //generate four digit otp

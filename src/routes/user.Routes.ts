@@ -9,6 +9,7 @@ import { setUserOffline, setUserOnline } from "../middlewares/userStatus.middwar
 import { ApiResponse } from "../utils/ApiResponse";
 import { redisClient } from "../config/redisConfig";
 import { searchAllUser } from "../controllers/user/searchUser";
+import { GetSingleUserById } from "../controllers/user/getUserById";
 //import { createClient } from "redis";
 //const redisClient = createClient()
 
@@ -22,6 +23,7 @@ router.route("/search").get(searchAllUser);
 
 router.route("/all-users").get(getAllUser);
 router.route("/me").get(me);
+router.route("/user/:userId").get(GetSingleUserById);
 router.route("/update-user/:userId").patch(upload.fields([
     { name: 'image', maxCount: 1 }
 ]), update_user_details);
