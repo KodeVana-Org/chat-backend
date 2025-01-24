@@ -24,11 +24,13 @@
     }
 */
 
+import { promises } from "dns";
 import { Conversation, IConversation } from "../../models/conversation.Model";
 import { ApiError } from "../../utils/ApiError";
 import { ApiResponse } from "../../utils/ApiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { Request, Response } from "express";
+import { throws } from "assert";
 
 export const createConversation = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
 
@@ -226,4 +228,183 @@ export const renameGroup = asyncHandler(async (req: Request, res: Response): Pro
         throw new ApiError(500, "Internal server error", [errorMessage]);
     }
 
+})
+
+
+/*
+ * Delete the group
+ * Only the admin will delete the group
+ */
+
+export const deleteGroup = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    try {
+
+        const userId = req.params.userId
+        const { groupId } = req.body
+
+        //Find the group Id
+        const groupConversation = await Conversation.findOne({
+            _id: groupId, isGroupChat: true
+        })
+
+        if (!groupConversation) {
+            throw new ApiError(404, "group not found")
+        }
+
+        //Check user admin or not
+        const isAdmin = groupConversation.participants.some(
+            (participant) => participant.userId.toString() === userId.toString() && participant.isAdmin
+        )
+
+        if (!isAdmin) {
+            throw new ApiError(403, "You are not authorized to delete this group")
+        }
+
+        //Delete the group
+        await groupConversation.deleteOne()
+
+        return res.status(200).json(
+            new ApiResponse(200, {}, "group deleted successfully")
+        )
+
+    } catch (error) {
+        console.error("Error while fetching conversations:", error);
+
+        // Safely extract error message
+        let errorMessage = "An unknown error occurred";
+        if (error instanceof ApiError) {
+            return res.status(error.statusCode).json(error);
+        } else if (error instanceof Error && error.message) {
+            errorMessage = error.message;
+        }
+
+        // Throw a generic API error if it's not an ApiError
+        throw new ApiError(500, "Internal server error", [errorMessage]);
+    }
+})
+
+
+/*
+ * Remove the member from  the group
+ */
+
+export const removeMember = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    try {
+
+        const userId = req.params.userId
+        const { groupId, memberId } = req.body
+
+        //Find the group Id
+        const groupConversation = await Conversation.findOne({
+            _id: groupId, isGroupChat: true
+        })
+
+        if (!groupConversation) {
+            throw new ApiError(404, "group not found")
+        }
+
+        //Check user admin or not
+        const isAdmin = groupConversation.participants.some(
+            (participant) => participant.userId.toString() === userId.toString() && participant.isAdmin
+        )
+
+        if (!isAdmin) {
+            throw new ApiError(403, "You are not authorized to delete this group")
+        }
+
+        //Check if the member exist in the group
+        const memberIndex = groupConversation.participants.findIndex(
+            (participant) => participant.userId.toString() === memberId.toString()
+        )
+
+        if (memberIndex === -1) {
+            throw new ApiError(404, "Member not found in this group")
+        }
+
+        //Here remove the member 
+        groupConversation.participants.splice(memberIndex, 1)
+
+        //save the updated group
+        await groupConversation.save()
+
+
+        return res.status(200).json(
+            new ApiResponse(200, { groupId, removedMemberId: memberId }, "Member removed successfully"))
+
+    } catch (error) {
+        console.error("Error while fetching conversations:", error);
+
+        // Safely extract error message
+        let errorMessage = "An unknown error occurred";
+        if (error instanceof ApiError) {
+            return res.status(error.statusCode).json(error);
+        } else if (error instanceof Error && error.message) {
+            errorMessage = error.message;
+        }
+
+        // Throw a generic API error if it's not an ApiError
+        throw new ApiError(500, "Internal server error", [errorMessage]);
+    }
+})
+
+
+/*
+ * Remove the member from  the group
+ */
+
+export const addGroupMember = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const userId = req.params.userId
+        const { groupId, newMemberId } = req.body
+
+        //Find the group
+        const groupConversation = await Conversation.findOne({
+            _id: groupId,
+            isGroupChat: true
+        })
+
+        if (!groupConversation) {
+            throw new ApiError(404, "Group not found")
+        }
+
+        //Check the reqesting user is admin
+        const isAdmin = groupConversation.participants.some(
+            (participant) => participant.userId.toString() === userId.toString() && participant.isAdmin
+        )
+
+        //if user is not admin
+        if (!isAdmin) {
+            throw new ApiError(400, "You are not authorized to add member in this group")
+        }
+
+        //Check if the  member is already in group
+        const isAlreadyMember = groupConversation.participants.some(
+            (participant) => participant.userId.toString() === newMemberId.toString()
+        )
+
+        if (isAlreadyMember) {
+            throw new ApiError(400, "User is already a member in this group")
+        }
+
+        //Add the member to the group
+        groupConversation.participants.push({
+            userId: newMemberId,
+            isAdmin: false,
+            role: "member"
+        })
+
+        //saved the updated grop
+        await groupConversation.save()
+
+        // Return success response
+        return res.status(200).json(
+            new ApiResponse(200, { groupId, addedMemberId: newMemberId }, "Member added successfully")
+        );
+
+
+
+    } catch (error: any) {
+        console.error("Error adding member to group:", error);
+        throw new ApiError(500, "Internal server error", [error.message || error.toString()]);
+    }
 })

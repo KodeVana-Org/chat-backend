@@ -4,7 +4,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 interface Iparticipant {
     userId: mongoose.Types.ObjectId;
     isAdmin: boolean;
-    role?: "string";
+    role?: string;
 }
 
 //conversation interface

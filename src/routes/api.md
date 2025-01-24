@@ -83,7 +83,24 @@
    * Rename group :=> 
             Take the userId {who will change group name in params}
             Body: newName, conversationId
-    PATCH :=> /api/v1/conversation/rename-group
+    PATCH :=> /api/v1/conversation/rename-group/:userId
+
+    * Delete the group by admin
+            Take the groupId by body
+    DELETE :=> /api/v1/conversation/delete-group/:userId
+
+    * Remove member from group by admin
+           Body: 
+                memberId (To remove)
+                groupId
+    POST:=> /api/v1/conversation/remove-member/:userId
+
+    * Add Member in group
+            Body: 
+                newMemberId
+                groupId
+    POST:=> /api/v1/conversation/add-member/:userId
+
 
 ## lets try to set user is not or offline
     <<-+ added two extra field name status & lastseen ++>
