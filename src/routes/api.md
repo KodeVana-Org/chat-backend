@@ -17,6 +17,9 @@
     --> /api/v1/users/me (work both userid and token)
     --> /api/v1/users/protected (insert the token in header)
 
+* get single user by id :=> It will return image, email, avatar
+    --> /api/v1/users/user/:userId
+
 * update name,bio,profile
     **give userid in params and name the image 'image'
     --> /api/v1/users/update-user/userid 
