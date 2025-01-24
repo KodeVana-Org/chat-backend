@@ -4,11 +4,11 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 interface Iparticipant {
     userId: mongoose.Types.ObjectId;
     isAdmin: boolean;
-    role?: "string";
+    role?: string;
 }
 
 //conversation interface
-interface IConversation extends Document {
+export interface IConversation extends Document {
     participants: Iparticipant[]; //List of participants
     isGroupChat: boolean; // false for one to one chat
     groupName?: string;

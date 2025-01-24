@@ -73,6 +73,37 @@
 * see  freiends
     --> /api/v1/friend/friends/677d5bebc511fdf6b110a6e0
 
+## conversation Route
+   * Create Conversation :=> Body: 
+   POST:-> /api/v1/conversation/:userId
+
+   * Get all conversation
+   GET:-> /api/v1/conversation/con
+
+   * Get conversation by conversationId
+   GET:-> /api/v1/conversation/{conversationId}
+
+   * Rename group :=> 
+            Take the userId {who will change group name in params}
+            Body: newName, conversationId
+    PATCH :=> /api/v1/conversation/rename-group/:userId
+
+    * Delete the group by admin
+            Take the groupId by body
+    DELETE :=> /api/v1/conversation/delete-group/:userId
+
+    * Remove member from group by admin
+           Body: 
+                memberId (To remove)
+                groupId
+    POST:=> /api/v1/conversation/remove-member/:userId
+
+    * Add Member in group
+            Body: 
+                newMemberId
+                groupId
+    POST:=> /api/v1/conversation/add-member/:userId
+
 
 ## lets try to set user is not or offline
     <<-+ added two extra field name status & lastseen ++>
