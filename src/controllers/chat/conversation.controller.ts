@@ -24,13 +24,11 @@
     }
 */
 
-import { promises } from "dns";
 import { Conversation, IConversation } from "../../models/conversation.Model";
 import { ApiError } from "../../utils/ApiError";
 import { ApiResponse } from "../../utils/ApiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { Request, Response } from "express";
-import { throws } from "assert";
 
 export const createConversation = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
 
@@ -156,6 +154,40 @@ export const getAllConversations = asyncHandler(async (req: Request, res: Respon
 
         // Throw a generic API error if it's not an ApiError
         throw new ApiError(500, "Internal server error", [errorMessage]);
+    }
+})
+
+/*
+ * Get conversation by conversationId
+ */
+
+export const GetConversationBYId = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const userId = req.params.conversationId
+
+        //validate the Id
+        if (!userId) {
+            throw new ApiError(400, "Conversation Id is required")
+        }
+
+        //fetch converstaion
+        const conversation = await Conversation.findById(userId).populate({
+            path: "participants.userId",
+            select: "username avatar email"
+        })
+
+        if (!conversation) {
+            throw new ApiError(404, "Conversation not found")
+        }
+
+        // Return the conversation
+        return res.status(200).json(
+            new ApiResponse(200, { data: conversation }, "Conversation fetched successfully")
+        );
+
+    } catch (error: any) {
+        console.error("Error while fetching conversation:", error);
+        throw new ApiError(500, "Internal server error", error.message);
     }
 })
 
@@ -368,24 +400,24 @@ export const addGroupMember = asyncHandler(async (req: Request, res: Response): 
         }
 
         //Check the reqesting user is admin
+        // Check if the requesting user is an admin
         const isAdmin = groupConversation.participants.some(
             (participant) => participant.userId.toString() === userId.toString() && participant.isAdmin
-        )
+        );
 
-        //if user is not admin
+        // If the user is not an admin, return a 403 error
         if (!isAdmin) {
-            throw new ApiError(400, "You are not authorized to add member in this group")
+            throw new ApiError(403, "You are not authorized to add a member to this group");
         }
 
-        //Check if the  member is already in group
+        // Check if the new member is already in the group
         const isAlreadyMember = groupConversation.participants.some(
             (participant) => participant.userId.toString() === newMemberId.toString()
-        )
+        );
 
         if (isAlreadyMember) {
-            throw new ApiError(400, "User is already a member in this group")
+            throw new ApiError(400, "This user is already a member of the group");
         }
-
         //Add the member to the group
         groupConversation.participants.push({
             userId: newMemberId,
@@ -400,8 +432,6 @@ export const addGroupMember = asyncHandler(async (req: Request, res: Response): 
         return res.status(200).json(
             new ApiResponse(200, { groupId, addedMemberId: newMemberId }, "Member added successfully")
         );
-
-
 
     } catch (error: any) {
         console.error("Error adding member to group:", error);

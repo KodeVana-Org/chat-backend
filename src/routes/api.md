@@ -80,6 +80,9 @@
    * Get all conversation
    GET:-> /api/v1/conversation/con
 
+   * Get conversation by conversationId
+   GET:-> /api/v1/conversation/{conversationId}
+
    * Rename group :=> 
             Take the userId {who will change group name in params}
             Body: newName, conversationId

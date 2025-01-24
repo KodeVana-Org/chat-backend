@@ -1,10 +1,11 @@
 
 import { Router } from "express";
-import { addGroupMember, createConversation, deleteGroup, getAllConversations, removeMember, renameGroup } from "../controllers/chat/conversation.controller";
+import { GetConversationBYId, addGroupMember, createConversation, deleteGroup, getAllConversations, removeMember, renameGroup } from "../controllers/chat/conversation.controller";
 
 const router = Router();
 
 router.route("/:userId").post(createConversation);
+router.route("/:conversationId").get(GetConversationBYId);
 router.route("/con").get(getAllConversations);
 router.route("/rename-group/:userId").patch(renameGroup);
 router.route("/delete-group/:userId").delete(deleteGroup);
