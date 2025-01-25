@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Conversation } from "../../models/conversation.Model";
 import { Message } from "../../models/message.Model";
 import { ApiError } from "../../utils/ApiError";
@@ -117,6 +118,8 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
             giphyUrl
         })
 
+        //TODO: Here i think i need to add this message to lastMessage field in converstaion model
+
         //save the message to document
         await newMessage.save()
         return res.status(201).json(
@@ -165,4 +168,55 @@ export const getMessageByConversationId = asyncHandler(async (req: Request, res:
         throw new ApiError(500, "Internal server error", error.message);
     }
 
+})
+
+/**
+ * @desc    Delete a specific message from a conversation
+ * @route   DELETE /api/messages/:messageId
+ * @access  Private
+  
+ * Request Params:
+ * - messageId: The ID of the message to be deleted
+  
+ * Request Body:
+ * - userId: The ID of the user attempting to delete the message
+ */
+
+export const deleteMessage = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { userId } = req.body
+        const messageId = req.params.messageId
+
+        const message = await Message.findById(messageId)
+        if (!message) {
+            throw new ApiError(404, "Message not found")
+        }
+
+        //check if the reqesting message is the sender of the message
+        if (message.sender.toString() !== userId.toString()) {
+            throw new ApiError(403, "You are not authorized to delete this message")
+        }
+
+        //Delete the message 
+        await Message.findByIdAndDelete(messageId)
+
+        // I dont know about this mater right now NOTE:
+        //update conversation lastmessages filed if the deleted message was the last one
+        //
+        const conversation = await Conversation.findById(message.conversationId)
+
+        if (conversation?.lastMessage?.toString() === messageId) {
+            const previousMessage = await Message.findOne({ conversationId: message.conversationId })
+                .sort({ createdAt: -1 }); // Get the most recent message
+
+            conversation.lastMessage = previousMessage?._id as mongoose.Types.ObjectId | undefined; // Use type assertion
+            await conversation.save();
+        }
+
+        return res.status(200).json(new ApiResponse(200, {}, "Message deleted successfully"));
+
+    } catch (error: any) {
+        console.error("Error while deleting message:", error.message);
+        throw new ApiError(500, "Internal server error", error.message);
+    }
 })

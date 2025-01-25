@@ -147,8 +147,10 @@
     * get message by conversationId 
         GET :=> /api/v1/message/{conversationId}
 
-    * delete the message by conversation id
-
+    * delete the message 
+            messageId in params
+            userId in body
+        DELETE:=> /api/v1/message/{messageId} 
 
 ## lets try to set user is not or offline
     <<-+ added two extra field name status & lastseen ++>
