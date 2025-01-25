@@ -203,9 +203,8 @@ export const deleteMessage = asyncHandler(async (req: Request, res: Response): P
         //Delete the message 
         await Message.findByIdAndDelete(messageId)
 
-        // I dont know about this mater right now NOTE:
         //update conversation lastmessages filed if the deleted message was the last one
-        //
+
         const conversation = await Conversation.findById(message.conversationId)
 
         if (conversation?.lastMessage?.toString() === messageId) {

@@ -90,7 +90,6 @@ const MessageSchema = new Schema<IMessage>(
             type: documentSchema
         },
 
-        // NOTE: i dont know it is necesarry or not just puted here 
         content: {
             type: String,
             required: true,
