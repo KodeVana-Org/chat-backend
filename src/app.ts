@@ -7,6 +7,7 @@ import authRouter from "./routes/auth.Routes";
 import userRouter from "./routes/user.Routes";
 import friendRouter from "./routes/friend.Routes";
 import conversationRouter from "./routes/conversation.Routes";
+import messageRouter from "./routes/message.Routes"
 import { rateLimit } from "express-rate-limit";
 import requestIp from "request-ip";
 import { ApiError } from "./utils/ApiError";
@@ -72,6 +73,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/friend", friendRouter);
 app.use("/api/v1/conversation", conversationRouter);
+app.use("/api/v1/message", messageRouter);
 
 // 404 handler for invalid routes
 app.use(notFoundHandler)

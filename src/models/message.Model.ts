@@ -33,7 +33,7 @@ interface DocumentFile {
 
 interface IMessage extends Document {
     sender: mongoose.Types.ObjectId;  //Refernce to the User model
-    converstionId: mongoose.Types.ObjectId // Reference to the conversation model
+    conversationId: mongoose.Types.ObjectId // Reference to the conversation model
     content?: string; //Optional text content
     media?: Array<{
         type: "image" | "video" // Media type
@@ -62,7 +62,7 @@ const MessageSchema = new Schema<IMessage>(
             ref: "User",
             required: true,
         },
-        converstionId: {
+        conversationId: {
             type: Schema.Types.ObjectId,
             ref: "Conversation",
             required: true
