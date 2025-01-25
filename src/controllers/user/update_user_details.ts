@@ -12,7 +12,6 @@ const update_user_details = asyncHandler(async (req: Request, res: Response) => 
         //updating :=> name , bio, profile
         const { userId } = req.params
         const { name, bio } = req.body
-
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             throw new ApiError(404, "Invalid userId")
         }
@@ -27,44 +26,51 @@ const update_user_details = asyncHandler(async (req: Request, res: Response) => 
         if (name) user.username = name
         if (bio) user.bio = bio
 
+
         const files = req.files as { [fieldname: string]: Express.Multer.File[] }
-        const imageFile = files['image'][0]
+        const imageFile = files?.['image']?.[0]
 
 
         // Upload profile image to Cloudinary if provided
 
         // Upload profile image to Cloudinary
-        const imageResult = await new Promise<{ url: string; id: string }>((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream(
-                { resource_type: 'image' },
-                (error, result) => {
-                    if (error) {
-                        return reject(error);
-                    }
-                    if (!result || !result.secure_url || !result.public_id) {
-                        return reject(new Error("Failed to upload image to Cloudinary"));
-                    }
-                    resolve({
-                        url: result.secure_url,
-                        id: result.public_id,
-                    });
-                }
-            );
+        let imageResults: string | undefined;
 
+        if (imageFile) {
+            // Ensure the file buffer exists
             if (!imageFile.buffer) {
                 throw new Error("File buffer not found. Ensure you're using `multer.memoryStorage()`.");
             }
-            stream.end(imageFile.buffer); // Pass file buffer to Cloudinary
-        });
 
-        // Update user with the Cloudinary image details
-        user.avatar.url = imageResult.url;
-        user.save()
+            // Upload profile image to Cloudinary
+            imageResults = await new Promise<string>((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { resource_type: 'image' },
+                    (error, result) => {
+                        if (error) {
+                            return reject(error);
+                        }
+                        if (!result || !result.secure_url) {
+                            return reject(new Error("Failed to upload image to Cloudinary"));
+                        }
+                        resolve(result.secure_url); // Resolve with the image URL
+                    }
+                );
 
+                stream.end(imageFile.buffer); // Pass file buffer to Cloudinary
+            });
+
+            // Update user with the Cloudinary image details
+            user.avatar.url = imageResults;
+        }
+
+        // Save the updated user data
+        await user.save();
+
+        // Return response
         return res
             .status(200)
-            .json(new ApiResponse(200, { imageResult }, "updated bio successfully"));
-
+            .json(new ApiResponse(200, { imageResults }, "Updated bio successfully"));
     } catch (error) {
         console.error("Error while updating user details:", error);
 

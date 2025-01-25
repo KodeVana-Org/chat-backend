@@ -2,28 +2,6 @@
 
 ## now here this api is for chat-route
 
-## user route here
- <!--todo:  password changed: take old password and changed to new-->
-
- <!--Request: GET /api/users?search=John-->
-* search all user by paramas this made by frontend
-    -> api/v1/users/search NOTE: not tested yest
-
-* get all usrs 
-    -> api/v1/users/get-users
-
-* get me
-** using both userid and token
-    --> /api/v1/users/me (work both userid and token)
-    --> /api/v1/users/protected (insert the token in header)
-
-* get single user by id :=> It will return image, email, avatar
-    --> /api/v1/users/user/:userId
-
-* update name,bio,profile
-    **give userid in params and name the image 'image'
-    --> /api/v1/users/update-user/userid 
-
 
 ## auth route here
 * verify email => It will send email first then in the register route it will verify then it will saved to database

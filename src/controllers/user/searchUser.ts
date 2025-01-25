@@ -27,17 +27,21 @@ import { ApiResponse } from "../../utils/ApiResponse";
 
 const searchAllUser = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     try {
+        const { userId } = req.body
         const keyword = req.query.search
             ? {
                 $or: [
-                    { name: { $regex: req.query.search, $options: "i" } }, // Case-insensitive regex search for name
+                    { username: { $regex: req.query.search, $options: "i" } }, // Case-insensitive regex search for name
                     { email: { $regex: req.query.search, $options: "i" } }, // Case-insensitive regex search for email
                 ],
             }
             : {};
 
         // Fetch users from the database excluding the current user
-        const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+        // NOTE: here user token 
+        //const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+        const users = await User.find(keyword).find({ _id: { $ne: userId } });
+        console.log("empty", users)
 
         return res
             .status(200)
