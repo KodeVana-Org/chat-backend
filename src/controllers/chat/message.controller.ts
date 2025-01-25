@@ -112,8 +112,10 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
             conversationId,
             type,
             content,
-            media,
-            document,
+            media: media.map((item: any) => ({
+                type: item.type, // Ensure "type" is either "image" or "video"
+                url: item.url,   // Provide a valid URL
+            })), document,
             audioUrl,
             giphyUrl
         })
@@ -221,3 +223,35 @@ export const deleteMessage = asyncHandler(async (req: Request, res: Response): P
         throw new ApiError(500, "Internal server error", error.message);
     }
 })
+
+/**
+ * @description Fetch Media for specific messageId
+ * @route GET /api/messages/:messageId/media
+ * @access Protected (Requires authentication)
+ */
+
+export const getMessageMedia = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const messageId = req.params.messageId;
+
+    // Validate messageId
+    if (!mongoose.Types.ObjectId.isValid(messageId)) {
+        throw new ApiError(400, "Invalid message ID");
+    }
+
+    // Fetch the message
+    const message = await Message.findById(messageId).select("media");
+    if (!message) {
+        throw new ApiError(404, "Message not found");
+    }
+
+    // Check if the message has media
+    if (!message.media || message.media.length === 0) {
+        throw new ApiError(404, "No media found for this message");
+    }
+
+    // Return the media details
+    return res.status(200).json(
+        new ApiResponse(200, { media: message.media }, "Media fetched successfully")
+    );
+});
+
