@@ -105,5 +105,52 @@
     POST:=> /api/v1/conversation/add-member/:userId
 
 
+## Message Route
+    * send message
+  
+     //TEXT
+    // "conversationId":"6793d5f1818ebb2b43c91243",
+    // "type": "Text",
+    // "sender":"677dbe9fdf12277af282c8c9",
+    // "content": "Hello! How are you?"
+
+    //MEDIA
+    // "type": "Media",
+    // "sender":"677dbe9fdf12277af282c8c9",
+    // "conversationId":"6793d5f1818ebb2b43c91243",
+    // "content": "Im fine",
+    // "media": [
+    //             { "type": "image", "url": "https://example.com/image1.jpg" },
+    //             { "type": "video", "url": "https://example.com/video1.mp4" }
+    //         ]
+
+    //Document
+    // "type": "Document",
+    // "sender":"677dbe9fdf12277af282c8c9",
+    // "conversationId":"6793d5f1818ebb2b43c91243",
+    // "content":"im fine too bro",
+    //                 "document": {
+    //                 "url": "https://example.com/document.pdf",
+    //                 "name": "My Document",
+    //                 "size": 12345
+    //             }
+
+     //Document
+    // "type": "Audio",
+    // "sender":"677dbe9fdf12277af282c8c9",
+    // "conversationId":"6793d5f1818ebb2b43c91243",
+    // "content":"im fine too bro",
+    // "audioUrl": "https://example.com/audio.mp3"
+
+        POST :=> /api/v1/message
+
+    * get message by conversationId 
+        GET :=> /api/v1/message/{conversationId}
+
+    * delete the message 
+            messageId in params
+            userId in body
+        DELETE:=> /api/v1/message/{messageId} 
+
 ## lets try to set user is not or offline
     <<-+ added two extra field name status & lastseen ++>

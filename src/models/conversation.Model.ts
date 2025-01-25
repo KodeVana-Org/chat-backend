@@ -64,7 +64,7 @@ const conversationSchema = new Schema<IConversation>(
         },
         lastMessage: {
             type: Schema.Types.ObjectId,
-            ref: "ChatMessage",
+            ref: "Message",
         },
     },
     { timestamps: true },
