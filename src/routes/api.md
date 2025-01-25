@@ -152,5 +152,34 @@
             userId in body
         DELETE:=> /api/v1/message/{messageId} 
 
+    * fetch media
+      GET /api/message/:messageId/media
+         ** Response:=>
+                    {
+                        "status": 200,
+                        "data": {
+                            "media": [
+                                {
+                                    "type": "image",
+                                    "url": "https://cloudinary.com/some-image.jpg"
+                                },
+                                {
+                                    "type": "video",
+                                    "url": "https://cloudinary.com/some-video.mp4"
+                                }
+                            ]
+                        },
+                        "message": "Media fetched successfully"
+                    }
+
+            ** Status: 404
+                    {
+                        "status": 404,
+                        "message": "No media found for this message"
+                    }
+    
+
+
+
 ## lets try to set user is not or offline
     <<-+ added two extra field name status & lastseen ++>
