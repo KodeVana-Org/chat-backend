@@ -72,7 +72,8 @@ const MessageSchema = new Schema<IMessage>(
                 type: {
                     type: String,
                     enum: ["image", "video"]
-                }
+                },
+                url: String
             }
         ],
         audioUrl: {
