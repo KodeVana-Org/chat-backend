@@ -118,10 +118,11 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
             giphyUrl
         })
 
-        //TODO: Here i think i need to add this message to lastMessage field in converstaion model
 
         //save the message to document
         await newMessage.save()
+        conversation.lastMessage = newMessage._id as mongoose.Types.ObjectId; // Use type assertion
+        await conversation.save();
         return res.status(201).json(
             new ApiResponse(201, { message: newMessage }, "Message Sent Successfully")
         )
