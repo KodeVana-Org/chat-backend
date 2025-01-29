@@ -6,15 +6,16 @@
 ## auth route here
 
 > it will take only email and send otp to the response
-* verify email => It will send email first then in the register route it will verify then it will saved to database
-    -> api/v1/auth/verify-email" NOTE: not tested yet
+* verify email
+>PURPOSE:  This route  will send otp to the email 
+* BODY: email ( only take email in body)
+    -> api/v1/auth/verify-email"
 
+*  **BODY: username(must be unique), email, password, otp
 * register
     -> api/v1/auth/register
 
-* email verification
-    -> api/v1/auth/email-verify
-
+*  **BODY: email, password
 * login
     -> api/v1/auth/login
 

@@ -19,7 +19,7 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
          * Lets check if hte email is already registerd
         */
 
-        const user_already_registerd = await User.findById(email)
+        const user_already_registerd = await User.findOne({ email })
         if (user_already_registerd) {
             return res.status(400).json({
                 message: "User already registerd"
@@ -88,14 +88,12 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
             message: "Email and OTP not exist"
         })
     }
-
     if (tempEmail_exist) {
-        if (!tempEmail_exist.otp === otp) {
+        if (tempEmail_exist.otp != otp) {
             return res.status(401).json({
                 message: "OTP is not matched"
             })
         }
-        return
     }
 
 
