@@ -26,7 +26,6 @@ const auth_google = asyncHandler(async (req: Request, res: Response): Promise<Re
             console.error("Error while verifying token", error);
             throw new ApiError(400, "Invalid Google token");
         }
-        console.log(response)
 
         //check if the user {googleId} already registerd
         let user = await User.findOne({ googleId: response.sub });
