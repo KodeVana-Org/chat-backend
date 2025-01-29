@@ -9,33 +9,39 @@
 * verify email
 >PURPOSE:  This route  will send otp to the email 
 * BODY: email ( only take email in body)
-    -> api/v1/auth/verify-email"
+    -> api/v1/auth/register"
 
 *  **BODY: username(must be unique), email, password, otp
 * register
-    -> api/v1/auth/register
+    -> api/v1/auth/verify-email"
 
-*  **BODY: email, password
+*  **BODY: {email, password}
 * login
     -> api/v1/auth/login
 
+* BODY: {emaill}  
 * forgot password -> otp send here  through email
     -> api/v1/auth/forgot-password
 
+* BODY: {email}
 * resent otp 
     ->api/v1/auth/resent-otp
 
+* BODY: {email}
 * verify-otp
     -> api/v1/auth/verify-otp
 
+* BODY: {email, new_password}
 * new password -> set new password here
     -> api/v1/auth/new-password
+
+* BODY :{email, oldPassword, newPassword }
+* chaned password  
+-> api/v1/auth/change-password NOTE: not test yes
 
 * log in  with google 
     -> api/v1/auth/google
 
-* chaned password 
-    -> api/v1/auth/change-password NOTE: not test yes
 
 ## friend route here
 * send friend request
