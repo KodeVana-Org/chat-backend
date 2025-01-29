@@ -30,6 +30,7 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
 
         //generate four digit otp
         const otp = generate_otp(4)
+        console.log("OTP: ", otp)
 
         //if emial exist then update the opt and send
         if (emailExist) {
