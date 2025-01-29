@@ -25,6 +25,7 @@ const forgot_password = asyncHandler(async (req: Request, res: Response): Promis
 
         // Generate an OTP and save it to the user document
         const otp = generate_otp(4);
+        console.log("OTP", otp)
         user.otp = otp;
         await user.save();
 
