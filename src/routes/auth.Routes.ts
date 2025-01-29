@@ -21,8 +21,8 @@ const router = Router();
 
 // public-route
 
-router.route("/verify-email").post(verifyEmail);
-router.route("/register").post(userRegisterValidator(), validate, registerUser);
+router.route("/register").post(verifyEmail);
+router.route("/verify-email").post(userRegisterValidator(), validate, registerUser);
 router.route("/login").post(userLoginValidator(), validate, loginUser);
 router.route("/forgot-password").post(forgot_password);
 router.route("/resent-otp").post(resendOTP);
