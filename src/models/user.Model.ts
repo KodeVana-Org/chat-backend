@@ -5,7 +5,6 @@ import {
     generateRefreshToken,
     generateTemperaryToken,
 } from "../utils/authHelper";
-import { defaultMaxListeners } from "events";
 
 export enum UserRoles {
     ADMIN = "ADMIN",

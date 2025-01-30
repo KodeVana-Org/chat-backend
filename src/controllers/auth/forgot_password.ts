@@ -1,4 +1,4 @@
-import { User } from "../../models/user.Model"
+import { IUser, User } from "../../models/user.Model"
 import { generate_otp } from "../../services/generate_otp"
 import { ApiError } from "../../utils/ApiError"
 import { ApiResponse } from "../../utils/ApiResponse"
@@ -18,7 +18,7 @@ const forgot_password = asyncHandler(async (req: Request, res: Response): Promis
         }
 
         // Find the user by ID and include the email field
-        const user = await User.findOne({ email }).select("+email");
+        const user: IUser | null = await User.findOne({ email }).select("+email +username");
         if (!user) {
             throw new ApiError(404, "User not found");
         }
@@ -32,6 +32,7 @@ const forgot_password = asyncHandler(async (req: Request, res: Response): Promis
         // Send the OTP to the user's email
         await sendOtp(user.email, otp);
         console.log("OTP sent successfully to:", user.email);
+
 
         // Return success response
         return res

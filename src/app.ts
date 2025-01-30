@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request } from "express";
 import cors from "cors";
 import env from "./config/dotenvConfig";
 import { createServer } from "http";

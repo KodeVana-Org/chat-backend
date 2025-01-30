@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer"
 import env from "../config/dotenvConfig";
+import { sendOTP } from "../template/verify.OTP.Template"
 
 const transporter = nodemailer.createTransport({
     //host: "smtp.ethereal.email",
@@ -23,7 +24,9 @@ export async function sendOtp(email: string, otp: number): Promise<void> {
             to: email,
             subject: "otp",
             text: `you top is ${otp}`,
-            html: `<p>Your OTP is: <strong>${otp}</strong></p>`
+            //html: `<p>Your OTP is: <strong>${otp}</strong></p>`
+            html: sendOTP(email, otp)
+
 
         })
         console.log("Message sent: %s", info.messageId);
