@@ -21,7 +21,7 @@ const router = Router();
 router.route("/search").get(searchAllUser);
 
 
-router.route("/all-users").get(getAllUser);
+router.route("/all-users/:userId").get(getAllUser);
 router.route("/me").get(me);
 router.route("/user/:userId").get(GetSingleUserById);
 router.route("/update-user/:userId").patch(upload.fields([

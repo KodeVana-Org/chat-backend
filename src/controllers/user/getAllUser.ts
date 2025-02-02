@@ -6,7 +6,7 @@ import { ApiResponse } from "../../utils/ApiResponse";
 
 const getAllUser = asyncHandler(async (req: Request, res: Response) => {
     try {
-        const { userId } = req.body;
+        const { userId } = req.params;
         console.log("ID", userId)
         // Fetch all users except the current user
         const allUser = await User.find({ _id: { $ne: userId } }).select("username email avatar");
