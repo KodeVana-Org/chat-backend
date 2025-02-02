@@ -9,46 +9,58 @@ const getAllUser = asyncHandler(async (req: Request, res: Response) => {
         const { userId } = req.body;
 
         // Fetch all users except the current user
-        const allUser = await User.find({ _id: { $ne: userId } });
+        const allUser = await User.find({ _id: { $ne: userId } }).select("username email avatar");
 
         if (allUser.length === 0) {
             return res.status(404).json(new ApiError(404, "No users found"));
         }
 
         // Fetch the current user
-        let me = await User.findById(userId);
+        let me = await User.findById(userId).select("username email avatar friends sentFriendReq incommingFriendReq bio status");
         if (!me) {
             return res.status(404).json(new ApiError(404, "User not found"));
         }
 
         // Conditionally populate fields only if they are not empty
-        let query = User.findById(userId);
-        if (me.friends?.length) query = query.populate("friends");
+        let query = User.findById(userId).select("username email avatar friends sentFriendReq incommingFriendReq bio status");
+
+        if (me.friends?.length) query = query.populate("friends", "username email avatar bio status");
         if (me.sentFriendReq?.length) query = query.populate({
             path: "sentFriendReq",
-            model: "Friend", // Ensure this matches mongoose.model name
+            model: "Friend",
+            select: "recipient status", // Select only necessary fields
+            populate: { path: "recipient", select: "username email avatar" }, //the guy detail who send the friend request
         });
         if (me.incommingFriendReq?.length) query = query.populate({
             path: "incommingFriendReq",
-            model: "Freind"
-            //model: "FriendRequest",
+            model: "Friend",
+            select: "sender status",
+            populate: { path: "sender", select: "username email avatar" },
         });
 
         // Execute the final query with population
         me = await query.exec();
 
+        // Create a filtered response
         const Data = {
-            ...me!.toObject(),
+            _id: me!._id,
+            username: me!.username,
+            email: me!.email,
+            avatar: me!.avatar,
+            bio: me!.bio,
+            status: me!.status,
             friends: me!.friends || [],
             sentFriendReq: me!.sentFriendReq || [],
             incommingFriendReq: me!.incommingFriendReq || [],
         };
 
         return res.status(200).json(
-            new ApiResponse(200, { me: Data, all_users: allUser }, "Successfully fetched all users")
+            new ApiResponse(200, { user: Data, users: allUser }, "Successfully fetched all users")
         );
     } catch (error) {
         console.error("Error fetching users:", error);
         return res.status(500).json(new ApiError(500, "Error while fetching users"));
     }
-}); export { getAllUser };
+});
+
+export { getAllUser };
