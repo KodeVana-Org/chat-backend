@@ -8,44 +8,46 @@ const getAllUser = asyncHandler(async (req: Request, res: Response) => {
     try {
         const { userId } = req.body;
 
-        // Fetch all users except the current user
-        const allUser = await User.find({ _id: { $ne: userId } });
-
-        if (allUser.length === 0) {
-            return res.status(404).json(new ApiError(404, "No users found"));
-        }
-
         // Fetch the current user
-        let me = await User.findById(userId);
+        let me = await User.findById(userId)
+            .select("username email avatar friends sentFriendReq incommingFriendReq bio status")
+            .populate({
+                path: "sentFriendReq",
+                model: "Friend",
+                select: "recipient",
+            });
+
         if (!me) {
             return res.status(404).json(new ApiError(404, "User not found"));
         }
 
-        // Conditionally populate fields only if they are not empty
-        let query = User.findById(userId);
-        if (me.friends?.length) query = query.populate("friends");
-        if (me.sentFriendReq?.length) query = query.populate({
-            path: "sentFriendReq",
-            model: "Friend", // Ensure this matches mongoose.model name
-        });
-        if (me.incommingFriendReq?.length) query = query.populate({
-            path: "incommingFriendReq",
-            model: "Freind"
-            //model: "FriendRequest",
-        });
+        // Extract user IDs from sent friend requests
+        const sentFriendReqIds = me.sentFriendReq.map((req: any) => req.recipient.toString());
 
-        // Execute the final query with population
-        me = await query.exec();
+        // Find all users except the current user
+        const allUsers = await User.find({ _id: { $ne: userId } }).select("username email avatar");
 
+        // Filter users into two categories
+        const usersWithSentRequests = allUsers.filter(user => sentFriendReqIds.includes(user._id.toString()));
+        const usersWithoutSentRequests = allUsers.filter(user => !sentFriendReqIds.includes(user._id.toString()));
+
+        // Construct minimal user data response
         const Data = {
-            ...me!.toObject(),
-            friends: me!.friends || [],
-            sentFriendReq: me!.sentFriendReq || [],
-            incommingFriendReq: me!.incommingFriendReq || [],
+            _id: me._id,
+            username: me.username,
+            email: me.email,
+            avatar: me.avatar,
+            bio: me.bio,
+            status: me.status,
+            friends: me.friends || [],
         };
 
         return res.status(200).json(
-            new ApiResponse(200, { me: Data, all_users: allUser }, "Successfully fetched all users")
+            new ApiResponse(200, {
+                //me: Data,
+                usersWithoutSentRequests, // Users the current user hasn't sent a friend request to
+                usersWithSentRequests,    // Users the current user has sent a friend request to
+            }, "Successfully fetched users")
         );
     } catch (error) {
         console.error("Error fetching users:", error);
