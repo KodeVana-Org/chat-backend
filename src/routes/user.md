@@ -45,7 +45,7 @@
 
 
 ## get all usrs 
-    GET: api/v1/users/get-users
+    GET: api/v1/users/all-users
     **RESPONSE**: 
 {
     "statusCode": 200,

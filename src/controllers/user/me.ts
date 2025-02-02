@@ -9,7 +9,6 @@ const me = asyncHandler(async (req: Request, res: Response): Promise<Response> =
     try {
         let user;
 
-        console.log("this is executing")
         // Check if `userId` is provided
         const { userId } = req.body;
 
@@ -27,7 +26,6 @@ const me = asyncHandler(async (req: Request, res: Response): Promise<Response> =
             if (!token) {
                 throw new ApiError(403, "Invalid token format");
             }
-            console.log("this is also executing")
 
             // Decode token to get the user ID (assuming you have a verifyToken function)
             const decoded = await new Promise((resolve, reject) => {

@@ -19,14 +19,12 @@ const sent_fr_request = asyncHandler(async (req: Request, res: Response) => {
         if (!recipient || !sender) {
             throw new ApiError(404, "userId or sender Id not found");
         }
-        console.log("is this executing")
         //check if a friend reqest already exists or already sended
         const existingRequest = await FriendRequest.findOne({
             sender: sender._id,
             recipient: recipient._id,
         });
 
-        console.log("is this executing", existingRequest)
 
         if (existingRequest) {
             //console.log("Friend request already exists. Throwing error...");
