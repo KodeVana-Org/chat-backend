@@ -7,7 +7,7 @@ import { ApiResponse } from "../../utils/ApiResponse";
 const getAllUser = asyncHandler(async (req: Request, res: Response) => {
     try {
 
-        const { userId } = req.body;
+        const { userId } = req.params;
 
         // Fetch the current user
         let me = await User.findById(userId)
@@ -21,24 +21,24 @@ const getAllUser = asyncHandler(async (req: Request, res: Response) => {
 
 
         // Extract user IDs from sent friend requests
-        const sentFriendReqIds = me.sentFriendReq.map((req: any) => req.recipient.toString());
+        const sentFriendReqIds = me?.sentFriendReq.map((req: any) => req.recipient.toString());
 
         // Find all users except the current user
         const allUsers = await User.find({ _id: { $ne: userId } }).select("username email avatar");
 
         // Filter users into two categories
-        const usersWithSentRequests = allUsers.filter(user => sentFriendReqIds.includes(user._id.toString()));
-        const usersWithoutSentRequests = allUsers.filter(user => !sentFriendReqIds.includes(user._id.toString()));
+        const usersWithSentRequests = allUsers.filter(user => sentFriendReqIds?.includes(user._id.toString()));
+        const usersWithoutSentRequests = allUsers.filter(user => !sentFriendReqIds?.includes(user._id.toString()));
 
         // Construct minimal user data response
         const Data = {
-            _id: me._id,
-            username: me.username,
-            email: me.email,
-            avatar: me.avatar,
-            bio: me.bio,
-            status: me.status,
-            friends: me.friends || [],
+            _id: me!._id,
+            username: me!.username,
+            email: me!.email,
+            avatar: me!.avatar,
+            bio: me!.bio,
+            status: me!.status,
+            friends: me!.friends || [],
         };
 
         return res.status(200).json(
