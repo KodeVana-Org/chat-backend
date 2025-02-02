@@ -6,56 +6,48 @@ import { ApiResponse } from "../../utils/ApiResponse";
 
 const getAllUser = asyncHandler(async (req: Request, res: Response) => {
     try {
-        const { userId } = req.params;
-        console.log("ID", userId)
-        // Fetch all users except the current user
-        const allUser = await User.find({ _id: { $ne: userId } }).select("username email avatar");
 
-        if (allUser.length === 0) {
-            return res.status(404).json(new ApiError(404, "No users found"));
-        }
-        console.log("Users:", allUser)
+        const { userId } = req.body;
+
         // Fetch the current user
-        let me = await User.findById(userId).select("username email avatar friends sentFriendReq incommingFriendReq bio status");
-        if (!me) {
-            return res.status(404).json(new ApiError(404, "User not found"));
-        }
+        let me = await User.findById(userId)
+            .select("username email avatar friends sentFriendReq incommingFriendReq bio status")
+            .populate({
+                path: "sentFriendReq",
+                model: "Friend",
+                select: "recipient",
+            });
 
-        // Conditionally populate fields only if they are not empty
-        let query = User.findById(userId).select("username email avatar friends sentFriendReq incommingFriendReq bio status");
 
-        if (me.friends?.length) query = query.populate("friends", "username email avatar bio status");
-        if (me.sentFriendReq?.length) query = query.populate({
-            path: "sentFriendReq",
-            model: "Friend",
-            select: "recipient status", // Select only necessary fields
-            populate: { path: "recipient", select: "username email avatar" }, //the guy detail who send the friend request
-        });
-        if (me.incommingFriendReq?.length) query = query.populate({
-            path: "incommingFriendReq",
-            model: "Friend",
-            select: "sender status",
-            populate: { path: "sender", select: "username email avatar" },
-        });
 
-        // Execute the final query with population
-        me = await query.exec();
+        // Extract user IDs from sent friend requests
+        const sentFriendReqIds = me.sentFriendReq.map((req: any) => req.recipient.toString());
 
-        // Create a filtered response
+        // Find all users except the current user
+        const allUsers = await User.find({ _id: { $ne: userId } }).select("username email avatar");
+
+        // Filter users into two categories
+        const usersWithSentRequests = allUsers.filter(user => sentFriendReqIds.includes(user._id.toString()));
+        const usersWithoutSentRequests = allUsers.filter(user => !sentFriendReqIds.includes(user._id.toString()));
+
+        // Construct minimal user data response
         const Data = {
-            _id: me!._id,
-            username: me!.username,
-            email: me!.email,
-            avatar: me!.avatar,
-            bio: me!.bio,
-            status: me!.status,
-            friends: me!.friends || [],
-            sentFriendReq: me!.sentFriendReq || [],
-            incommingFriendReq: me!.incommingFriendReq || [],
+            _id: me._id,
+            username: me.username,
+            email: me.email,
+            avatar: me.avatar,
+            bio: me.bio,
+            status: me.status,
+            friends: me.friends || [],
         };
 
         return res.status(200).json(
-            new ApiResponse(200, { user: Data, users: allUser }, "Successfully fetched all users")
+            new ApiResponse(200, {
+                //me: Data,
+                usersWithoutSentRequests, // Users the current user hasn't sent a friend request to
+                usersWithSentRequests,    // Users the current user has sent a friend request to
+            }, "Successfully fetched users")
+
         );
     } catch (error) {
         console.error("Error fetching users:", error);
