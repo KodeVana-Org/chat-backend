@@ -6,6 +6,7 @@ import { ApiResponse } from "../../utils/ApiResponse";
 
 const getAllUser = asyncHandler(async (req: Request, res: Response) => {
     try {
+
         const { userId } = req.body;
 
         // Fetch the current user
@@ -17,9 +18,7 @@ const getAllUser = asyncHandler(async (req: Request, res: Response) => {
                 select: "recipient",
             });
 
-        if (!me) {
-            return res.status(404).json(new ApiError(404, "User not found"));
-        }
+
 
         // Extract user IDs from sent friend requests
         const sentFriendReqIds = me.sentFriendReq.map((req: any) => req.recipient.toString());
@@ -48,9 +47,12 @@ const getAllUser = asyncHandler(async (req: Request, res: Response) => {
                 usersWithoutSentRequests, // Users the current user hasn't sent a friend request to
                 usersWithSentRequests,    // Users the current user has sent a friend request to
             }, "Successfully fetched users")
+
         );
     } catch (error) {
         console.error("Error fetching users:", error);
         return res.status(500).json(new ApiError(500, "Error while fetching users"));
     }
-}); export { getAllUser };
+});
+
+export { getAllUser };
