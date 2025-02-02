@@ -7,14 +7,14 @@ import { ApiResponse } from "../../utils/ApiResponse";
 const getAllUser = asyncHandler(async (req: Request, res: Response) => {
     try {
         const { userId } = req.body;
-
+        console.log("ID", userId)
         // Fetch all users except the current user
         const allUser = await User.find({ _id: { $ne: userId } }).select("username email avatar");
 
         if (allUser.length === 0) {
             return res.status(404).json(new ApiError(404, "No users found"));
         }
-
+        console.log("Users:", allUser)
         // Fetch the current user
         let me = await User.findById(userId).select("username email avatar friends sentFriendReq incommingFriendReq bio status");
         if (!me) {
