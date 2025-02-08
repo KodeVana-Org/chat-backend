@@ -31,7 +31,7 @@ const incomming_reuest = asyncHandler(async (req: Request, res: Response): Promi
 
         return res
             .status(200)
-            .json(new ApiResponse(200, { incomingRequests }, "fetched all incoming request"));
+            .json(new ApiResponse(200, { ID: userId, incomingRequests }, "fetched all incoming request"));
 
     } catch (error) {
         console.error("while while fetching all friend request", error)
