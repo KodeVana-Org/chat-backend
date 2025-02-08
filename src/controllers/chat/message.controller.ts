@@ -74,8 +74,10 @@ import { io } from "../../app";
 export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
     try {
         const { sender, conversationId, type, content, media, document, audioUrl, giphyUrl } = req.body
+
         console.log("BOTH ID", sender, conversationId)
         console.log("TYPE and conten", type, content)
+
         //validate the conversation
         const conversation = await Conversation.findById(conversationId)
         if (!conversation) {
@@ -106,7 +108,6 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
         if (type === "Giphy" && !giphyUrl) {
             throw new ApiError(400, "Giphy URL is required for a Giphy message");
         }
-
         //Construct the message  object
         const newMessage = new Message({
             //sender: req.user?._id, // if i use protected route
@@ -114,15 +115,15 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
             conversationId,
             type,
             content,
-            media: media.map((item: any) => ({
-                type: item.type, // Ensure "type" is either "image" or "video"
-                url: item.url,   // Provide a valid URL
-            })), document,
+            //media: media.map((item: any) => ({
+            //    type: item.type, // Ensure "type" is either "image" or "video"
+            //    url: item.url,   // Provide a valid URL
+            //})), document,
             audioUrl,
             giphyUrl
         })
 
-
+        console.log("NE message", newMessage)
         //save the message to document
         await newMessage.save()
         conversation.lastMessage = newMessage._id as mongoose.Types.ObjectId; // Use type assertion
