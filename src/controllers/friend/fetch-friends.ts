@@ -16,7 +16,7 @@ const get_friends = asyncHandler(async (req: Request, res: Response): Promise<Re
         }
 
         // Find the user and populate their friends
-        const user: IUser | null = await User.findById(userId).populate("friends", "name email");
+        const user: IUser | null = await User.findById(userId).populate("friends", "username avatar");
 
         // Check if user exists
         if (!user) {

@@ -24,10 +24,13 @@ const incomming_reuest = asyncHandler(async (req: Request, res: Response): Promi
             recipient: userId,
             sender: { $ne: userId }  // Exclude requests where user is the sender
         }).populate("sender", "username avatar"); // Populate sender details
+
         console.log(incomingRequests)
+
         if (!incomingRequests) {
             throw new ApiError(404, "No Friend Request Found")
         }
+        // if i want to send the model id how to send here
 
         return res
             .status(200)
