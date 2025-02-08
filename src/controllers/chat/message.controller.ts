@@ -5,6 +5,7 @@ import { ApiError } from "../../utils/ApiError";
 import { ApiResponse } from "../../utils/ApiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { Request, Response } from "express";
+import { io } from "../../app";
 
 /**
  * @description Controller to send a message in a conversation (one-to-one or group)
@@ -125,8 +126,11 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
         await newMessage.save()
         conversation.lastMessage = newMessage._id as mongoose.Types.ObjectId; // Use type assertion
         await conversation.save();
+
+        io.to(conversationId).emit("receiveMessage", newMessage);  // Emit message to specific room
+
         return res.status(201).json(
-            new ApiResponse(201, { message: newMessage }, "Message Sent Successfully")
+            new ApiResponse(201, { data: newMessage }, "Message Sent Successfully")
         )
 
     } catch (error: any) {
