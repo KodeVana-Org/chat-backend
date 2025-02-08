@@ -74,7 +74,8 @@ import { io } from "../../app";
 export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
     try {
         const { sender, conversationId, type, content, media, document, audioUrl, giphyUrl } = req.body
-
+        console.log("BOTH ID", sender, conversationId)
+        console.log("TYPE and conten", type, content)
         //validate the conversation
         const conversation = await Conversation.findById(conversationId)
         if (!conversation) {
