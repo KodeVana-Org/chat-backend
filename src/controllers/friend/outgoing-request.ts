@@ -21,7 +21,7 @@ const outgoing_request = asyncHandler(async (req: Request, res: Response): Promi
         }
 
         const sentRequests = await FriendRequest.find({ sender: userId })
-            .populate("recipient", "name email status") // Fetch recipient details
+            .populate("recipient", "username email status") // Fetch recipient details
             .exec();
 
         if (!sentRequests.length) {

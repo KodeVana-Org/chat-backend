@@ -19,15 +19,19 @@ const incomming_reuest = asyncHandler(async (req: Request, res: Response): Promi
             throw new ApiError(404, "user not found")
         }
 
-        const all_request = await FriendRequest.find()
-
-        if (!all_request) {
+        // Fetch only incoming friend requests where the user is the recipient, not the sender
+        const incomingRequests = await FriendRequest.find({
+            recipient: userId,
+            sender: { $ne: userId }  // Exclude requests where user is the sender
+        }).populate("sender", "username avatar"); // Populate sender details
+        console.log(incomingRequests)
+        if (!incomingRequests) {
             throw new ApiError(404, "No Friend Request Found")
         }
 
         return res
             .status(200)
-            .json(new ApiResponse(200, { all_request }, "fetched all incoming request"));
+            .json(new ApiResponse(200, { incomingRequests }, "fetched all incoming request"));
 
     } catch (error) {
         console.error("while while fetching all friend request", error)
