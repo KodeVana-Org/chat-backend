@@ -65,6 +65,7 @@ const io = new Server(httpServer, {
     pingTimeout: 60000,
     cors: {
         origin: env.ORIGIN,
+        methods: ["GET", "POST"],
         credentials: true,
     },
 });
@@ -83,4 +84,4 @@ app.use(errorHandler)
 
 handleUserStatus(io)
 
-export { httpServer, io };
+export { httpServer, io, app };
