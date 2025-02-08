@@ -27,6 +27,7 @@ const get_friends = asyncHandler(async (req: Request, res: Response): Promise<Re
         if (!user.friends || user.friends.length === 0) {
             return res.status(200).json(new ApiResponse(200, [], "No friends found"));
         }
+        //TODO: last message and last seen
 
         // Return the list of friends
         return res.status(200).json(

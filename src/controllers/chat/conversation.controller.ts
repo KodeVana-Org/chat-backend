@@ -55,7 +55,7 @@ export const createConversation = asyncHandler(async (req: Request, res: Respons
             if (existingConversation) {
                 console.log("is this executing 2")
                 return res.status(200).json(
-                    new ApiResponse(200, "existingConversation", "conversation already exist")
+                    new ApiResponse(200, existingConversation, "conversation already exist")
                 )
             }
         }

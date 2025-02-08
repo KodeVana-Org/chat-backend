@@ -96,8 +96,9 @@ const userSchemaFields = {
         default: "offline"
     },
     lastSeen: {
-        type: Date
+        type: Date, default: Date.now
     },
+
     sentFriendReq: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -116,6 +117,7 @@ const userSchemaFields = {
             ref: 'User'
         }
     ],
+
 
     refreshToken: String,
     forgotPasswordToken: String,
