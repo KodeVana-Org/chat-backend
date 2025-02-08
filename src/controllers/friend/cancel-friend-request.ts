@@ -35,8 +35,8 @@ const cancel_friend_request = asyncHandler(async (req: Request, res: Response): 
         });
 
         // Delete the friend request itself
-        await FriendRequest.findByIdAndDelete(friendRequest._id);
-
+        const deleted_user = await FriendRequest.findByIdAndDelete(friendRequest._id);
+        console.log("deleted user: ", deleted_user)
 
         return res.status(200).json(
             new ApiResponse(200, {}, "Friend request cancelled successfully")
