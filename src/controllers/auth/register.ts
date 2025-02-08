@@ -22,7 +22,7 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
         const user_already_registerd = await User.findOne({ email })
         if (user_already_registerd) {
             return res.status(400).json({
-                message: "User already registerd"
+                message: "This email is already registerd"
             })
         }
 
@@ -92,7 +92,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     if (tempEmail_exist) {
         if (tempEmail_exist.otp != otp) {
             return res.status(401).json({
-                message: "OTP is not matched"
+                message: "Incorrect OTP"
             })
         }
     }
@@ -146,7 +146,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     if (!user) {
         return res.status(404).json({
             success: false,
-            message: "user not exist ",
+            message: "User does not exist ",
         });
     }
     const isPasswordValid = await user.isPasswordCorrect(password);
