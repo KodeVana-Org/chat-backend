@@ -51,6 +51,9 @@
 * get all incomming request
     --> api/v1/friend/all-req/{id of the guy which will fetch all request}
 
+* get all outging request (the users which i have send freinds request)
+   --> api/v1/friend/all-req-ongoing/{userId}
+
 * accept friend request
     **here if userid the id will will accept the request will come from the params
     **and the requestid is the id of the friendrequest model will come from the body
