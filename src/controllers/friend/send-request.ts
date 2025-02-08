@@ -33,7 +33,7 @@ const sent_fr_request = asyncHandler(async (req: Request, res: Response) => {
                 .status(201)
                 .json(new ApiResponse(200, {}, "Friend request already sent"));
         }
-
+        let friend
         try {
             //create a new friend request
             const friendReq: IFriendRequest = new FriendRequest({
@@ -41,7 +41,7 @@ const sent_fr_request = asyncHandler(async (req: Request, res: Response) => {
                 recipient: recipient._id,
                 status: "pending",
             });
-            await friendReq.save();
+            friend = await friendReq.save();
 
             //add recipient(request accepter ) id to sender's model
             sender.sentFriendReq.push(friendReq._id as mongoose.Types.ObjectId);
@@ -58,7 +58,7 @@ const sent_fr_request = asyncHandler(async (req: Request, res: Response) => {
         await recipient.save();
         return res
             .status(200)
-            .json(new ApiResponse(200, "friend requeset sent successfully"));
+            .json(new ApiResponse(200, friend._id, "friend requeset sent successfully"));
     } catch (error) {
         throw new ApiError(500, "Error while sending friend request");
     }
