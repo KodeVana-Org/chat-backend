@@ -6,6 +6,7 @@ import { ApiResponse } from "../../utils/ApiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { Request, Response } from "express";
 import { io } from "../../app";
+import { cloudinary } from "../../config/cloudinaryConfigs";
 
 /**
  * @description Controller to send a message in a conversation (one-to-one or group)
@@ -36,23 +37,28 @@ import { io } from "../../app";
             }
          **Media**
              {
+               "sender":"677dbe9fdf12277af282c8c9",
               "conversationId": "6793d5f1818ebb2b43c91243",
                 "type": "Media",
-                "media": [
-                    { "type": "image", "url": "https://example.com/image1.jpg" },
-                    { "type": "video", "url": "https://example.com/video1.mp4" }
-                ]
+                "media" "image file"
+
+                //"media": [
+                //    { "type": "image", "url": "https://example.com/image1.jpg" },
+                //    { "type": "video", "url": "https://example.com/video1.mp4" }
+                //]
              }
 
          **Document**
              {
+               "sender":"677dbe9fdf12277af282c8c9",
                 "conversationId": "6487f3b2a5f1e24b7c57d95d",
                 "type": "Document",
-                "document": {
-                    "url": "https://example.com/document.pdf",
-                    "name": "My Document",
-                    "size": 12345
-                }
+                "document": "pdf file"
+                //"document": {
+                //    "url": "https://example.com/document.pdf",
+                //    "name": "My Document",
+                //    "size": 12345
+                //}
              }
 
          **Audio**
@@ -71,12 +77,21 @@ import { io } from "../../app";
 
  */
 
+type MulterFiles = {
+    [fieldname: string]: Express.Multer.File[]
+}
+
+type MediaUrl = {
+    type: "image" | "video";
+    url: string;
+};
+
 export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
     try {
-        const { sender, conversationId, type, content, media, document, audioUrl, giphyUrl } = req.body
+        const { sender, conversationId, type, content } = req.body
+        let { audioUrl, giphyUrl } = req.body
 
-        console.log("BOTH ID", sender, conversationId)
-        console.log("TYPE and conten", type, content)
+        const files = req.files as MulterFiles
 
         //validate the conversation
         const conversation = await Conversation.findById(conversationId)
@@ -89,43 +104,133 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
             throw new ApiError(400, "Invalid messge type")
         }
 
-        if (type === "Text" && !content) {
-            throw new ApiError(400, "Text content is required for a Text message")
+        const mediaUrls: MediaUrl[] = []; // Explicitly type the array
+        let documentUrl: {
+            url: string;
+            name: string;
+            size: number
+        } | null = null;
+
+        //Handle file uploads based on message type
+        switch (type) {
+            case "Text":
+                if (!content) {
+                    throw new ApiError(400, "Text content is required for a Text message")
+                }
+                break;
+
+            case "Media":
+                if (!files || !files.media || files.media.length === 0) {
+                    throw new ApiError(400, "Media files is required for a Media message")
+                }
+
+                //Upload media files to cloudinary
+                for (const file of files.media) {
+
+                    // this comment code only work when i saved the file temperory to uploads other wise need to convert in base64
+                    //const result = await cloudinary.uploader.upload(file.path, {
+                    //    resource_type: file.mimetype.startsWith("video") ? "video" : "image",
+                    //})
+
+                    const base64Data = file.buffer.toString("base64"); // Convert Buffer to base64 
+                    const result = await cloudinary.uploader.upload(
+                        `data:${file.mimetype};base64,${base64Data}`, {
+                        resource_type: file.mimetype.startsWith("video") ? "video" : "image",
+                    }
+                    );
+                    mediaUrls.push({
+                        type: file.mimetype.startsWith("video") ? "video" : "image",
+                        url: result.secure_url,
+                    })
+                }
+                //fs.unlinkSync(file.path); // Delete the temporary file no need here bease im not storing right now
+                break;
+
+            case "Document":
+                if (!files || !files.document || files.document.length === 0) {
+                    throw new ApiError(400, "Document file is required for a document message")
+                }
+                // Upload document to Cloudinary
+                const documentFile = files.document[0];
+                //const documentResult = await cloudinary.uploader.upload(documentFile.path, {
+
+                const base64Data = documentFile.buffer.toString("base64"); // Convert Buffer to base64
+                const documentResult = await cloudinary.uploader.upload(
+                    `data:${documentFile.mimetype};base64,${base64Data}`, {
+                    resource_type: "auto", // Automatically detect resource type
+                });
+                documentUrl = {
+                    url: documentResult.secure_url,
+                    name: documentFile.originalname,
+                    size: documentFile.size,
+                };
+                break;
+
+            //NOTE handling here
+            case "Audio":
+                if (!files || !files.audio || files.audio.length === 0) {
+                    throw new ApiError(400, "Audio file is required for an Audio message");
+                }
+                // Upload audio to Cloudinary
+                const audioFile = files.audio[0];
+                const audioResult = await cloudinary.uploader.upload(audioFile.path, {
+                    resource_type: "video", // Cloudinary treats audio files as video
+                });
+                audioUrl = audioResult.secure_url;
+                break;
+
+            case "Giphy":
+                if (!req.body.giphyUrl) {
+                    throw new ApiError(400, "Giphy URL is required for a Giphy message");
+                }
+                giphyUrl = req.body.giphyUrl;
+                break;
         }
 
-        if (type === "Media" && (!media || media.length == 0)) {
-            throw new ApiError(400, "Media array is required  for a media message")
-        }
 
-        if (type == "Document" && !document) {
-            throw new ApiError(400, "Document is required  for a document message")
-        }
+        /****
 
-        if (type === "Audio" && !audioUrl) {
-            throw new ApiError(400, "Audio URL is required for an Audio message");
-        }
+                if (type === "Text" && !content) {
+                    throw new ApiError(400, "Text content is required for a Text message")
+                }
 
-        if (type === "Giphy" && !giphyUrl) {
-            throw new ApiError(400, "Giphy URL is required for a Giphy message");
-        }
-        //Construct the message  object
-        const newMessage = new Message({
-            //sender: req.user?._id, // if i use protected route
+                if (type === "Media" && (!media || media.length == 0)) {
+                    throw new ApiError(400, "Media array is required  for a media message")
+                }
+
+                if (type == "Document" && !document) {
+                    throw new ApiError(400, "Document is required  for a document message")
+                }
+
+                if (type === "Audio" && !audioUrl) {
+                    throw new ApiError(400, "Audio URL is required for an Audio message");
+                }
+
+                if (type === "Giphy" && !giphyUrl) {
+                    throw new ApiError(400, "Giphy URL is required for a Giphy message");
+                }
+
+        ******/
+
+        // Construct the message object based on the type
+        const messageData = new Message({
             sender: sender,
             conversationId,
             type,
-            content,
-            //media: media.map((item: any) => ({
-            //    type: item.type, // Ensure "type" is either "image" or "video"
-            //    url: item.url,   // Provide a valid URL
-            //})), document,
-            audioUrl,
-            giphyUrl
-        })
+            content: type === "Text" ? content : undefined, // Only include content for Text messages
+            media: type === "Media" ? mediaUrls : undefined, // Only include media for Media messages
+            document: type === "Document" ? documentUrl : undefined, // Only include document for Document messages
+        });
 
-        console.log("NE message", newMessage)
-        //save the message to document
+
+        const newMessage = new Message(messageData);
         await newMessage.save()
+
+        // Remove 'media' field from Text and Document messages
+        if (type !== "Media") {
+            await Message.updateOne({ _id: newMessage._id }, { $unset: { media: "" } });
+        }
+
         conversation.lastMessage = newMessage._id as mongoose.Types.ObjectId; // Use type assertion
         await conversation.save();
 
