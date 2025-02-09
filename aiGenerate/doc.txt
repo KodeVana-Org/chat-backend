@@ -1,0 +1,73 @@
+AnimeGAN2 Avatar Generation API
+
+Overview
+
+This API allows users to upload an image and receive an anime-style avatar generated using the AnimeGAN2 model. The API processes the uploaded image and returns URLs for both the original and generated images.
+
+Technologies Used:
+
+    * Flask: Backend framework for handling HTTP requests
+    * PyTorch: Deep learning library used to load and run the AnimeGAN2 model
+    * PIL (Pillow): Image processing library for handling uploaded images
+    * UUID: Generates unique filenames for stored images
+    * OS & IO: Used for file handling and in-memory image processing
+
+API Endpoints
+
+1. Generate Anime Avatar
+
+Endpoint: POST /generate
+
+Request
+
+    * Content-Type: multipart/form-data
+
+    * Parameters:
+     image (file, required): The input image file (JPEG/PNG) to be processed.
+
+Response
+
+    * Status Code: 200 OK (on success) or 400 Bad Request (if no image is provided)
+
+    * Response Body:
+        {
+            "message": "Avatar generated successfully!",
+            "original_url": "http://127.0.0.1:5000/avatars/original_abc123.png",
+            "generated_url": "http://127.0.0.1:5000/avatars/generated_abc123.png"
+        }
+
+
+2. Retrieve Stored Images
+
+Endpoint: GET /avatars/<filename>
+
+Request
+
+    * Parameters:
+     * filename (string, required): The filename of the stored image.
+
+Response
+
+    * Returns the requested image file (either original or anime-style).
+    * Status Code: 200 OK (if file exists) or 404 Not Found (if file is missing).
+
+How It Works
+
+1.User Uploads an Image: 
+The user sends a POST request to /generate with an image file.
+
+2.Image Processing:
+The image is read and converted to RGB format.
+The AnimeGAN2 model processes the image and generates an anime-style version.
+
+3.Save and Generate URLs:
+The original and generated images are saved in the static/avatars/ directory.
+Unique filenames are generated using UUID.
+URLs for both images are returned in the response.
+
+4.User Accesses the Images: The returned URLs can be used to view/download the images.
+
+Running the Server
+To start the Flask server, run:
+    *python server.py
+
