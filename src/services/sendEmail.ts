@@ -29,7 +29,7 @@ export async function sendOtp(email: string, otp: number): Promise<void> {
 
 
         })
-        console.log("Message sent: %s", info.messageId);
+        //console.log("Message sent: %s", info.messageId);
     } catch (error) {
         console.error("Error while second email", error)
         throw error;

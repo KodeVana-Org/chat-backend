@@ -6,6 +6,7 @@ import { ApiResponse } from "../../utils/ApiResponse";
 import { generateAccessAndRefreshToken } from "../../utils/generateAccessAndRefreshToken";
 import { TempEmail } from "../../models/temp"
 import { generate_otp } from "../../services/generate_otp";
+import { sendOtp } from "../../services/sendEmail";
 
 /*
    first lets veify the user  throught the email if ther email is valid then we will register 
@@ -16,7 +17,7 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
         const { email } = req.body;
 
         /*
-         * Lets check if hte email is already registerd
+         * Lets check if the email is already registerd
         */
 
         const user_already_registerd = await User.findOne({ email })
@@ -26,6 +27,9 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
             })
         }
 
+        /* 
+         * Check email is already saved in tempEmail
+         */
         const emailExist = await TempEmail.findOne({ email })
 
         //generate four digit otp
@@ -36,6 +40,8 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
         if (emailExist) {
             emailExist.otp = otp
             await emailExist.save()
+
+            await sendOtp(email, otp);
             return res
                 .status(200)
                 .json(
@@ -46,11 +52,14 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
                     ),
                 );
         }
+        // NOTE: HERE SEND THE EMAIL
 
         //if email not exist that mean new user ,
         // new user  then save the mail and save the otp and send
         const newEmail = await TempEmail.create({ email, otp })
         await newEmail.save()
+
+        await sendOtp(email, otp);
 
         return res
             .status(200)

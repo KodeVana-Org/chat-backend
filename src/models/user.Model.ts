@@ -146,8 +146,6 @@ userSchema.methods.isPasswordCorrect = async function(
 };
 
 userSchema.methods.generateAccessToken = function(this: IUser): string {
-    console.log("this:", this)
-    console.log("output :", generateAccessToken(this))
     return generateAccessToken(this);
 };
 
