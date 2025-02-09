@@ -63,6 +63,9 @@
 * see  freiends
     --> /api/v1/friend/friends/677d5bebc511fdf6b110a6e0
 
+* generate avatar here 
+--> /api/v1/friend/upload
+
 ## conversation Route
    * Create Conversation :=> Body: 
    POST:-> /api/v1/conversation/:userId
