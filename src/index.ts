@@ -18,7 +18,7 @@ const initSocket = () => {
         console.log("I got userID from query handshake: ", userId)
 
         // Validate userId
-        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId as string)) {
             console.log("Invalid or missing User Id in query");
             socket.disconnect(true);
             return;
