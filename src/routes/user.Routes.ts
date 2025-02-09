@@ -7,7 +7,7 @@ import { update_user_details } from "../controllers/user/update_user_details";
 import { upload } from "../config/multerConfig";
 import { setUserOffline, setUserOnline } from "../middlewares/userStatus.middware";
 import { ApiResponse } from "../utils/ApiResponse";
-import { redisClient } from "../config/redisConfig";
+//import { redisClient } from "../config/redisConfig";
 import { searchAllUser } from "../controllers/user/searchUser";
 import { GetSingleUserById } from "../controllers/user/getUserById";
 //import { createClient } from "redis";
@@ -51,30 +51,30 @@ router.post("/offline/:userId", async (req, res) => {
 })
 
 //<-- FOR FETCHING STATUS INDIVIDUAL -->\\
-router.get("/user-status/:userId", async (req, res) => {
-    const { userId } = req.params;
-    try {
-        const status = await redisClient.hGet("user:status", userId)
+//router.get("/user-status/:userId", async (req, res) => {
+//    const { userId } = req.params;
+//    try {
+//        const status = await redisClient.hGet("user:status", userId)
+//
+//        if (!status) {
+//            return res.status(404).json(new ApiResponse(200, {}, "user status not found"))
+//        }
+//        return res.status(200).json(new ApiResponse(200, { userId, status }, "Success"))
+//    } catch (error) {
+//        console.error("Error fetching user status:", error)
+//        return res.status(500).json(new ApiResponse(500, {}, "Failed to fetch user status"))
+//    }
+//})
 
-        if (!status) {
-            return res.status(404).json(new ApiResponse(200, {}, "user status not found"))
-        }
-        return res.status(200).json(new ApiResponse(200, { userId, status }, "Success"))
-    } catch (error) {
-        console.error("Error fetching user status:", error)
-        return res.status(500).json(new ApiResponse(500, {}, "Failed to fetch user status"))
-    }
-})
-
-router.get("/user-status", async (req, res) => {
-    try {
-        const statuses = await redisClient.hGetAll("user:status");
-        return res.status(200).json(new ApiResponse(200, statuses, "Success"))
-    } catch (error) {
-        console.error("Error fetcing users statuses:", error)
-        return res.status(500).json(new ApiResponse(500, {}, "Failed to fetch status"))
-    }
-})
+//router.get("/user-status", async (req, res) => {
+//    try {
+//        const statuses = await redisClient.hGetAll("user:status");
+//        return res.status(200).json(new ApiResponse(200, statuses, "Success"))
+//    } catch (error) {
+//        console.error("Error fetcing users statuses:", error)
+//        return res.status(500).json(new ApiResponse(500, {}, "Failed to fetch status"))
+//    }
+//})
 
 
 export default router;
