@@ -13,18 +13,44 @@ const getAllUser = asyncHandler(async (req: Request, res: Response) => {
         let me = await User.findById(userId)
             .select("username email avatar friends sentFriendReq incommingFriendReq bio status")
             .populate({
+                path: "friends",
+                model: "User",
+                select: "_id",
+            })
+            .populate({
                 path: "sentFriendReq",
                 model: "Friend",
                 select: "recipient",
             });
 
-
+        // Extract user IDs from friends list
+        const friendIds = me?.friends.map((friend: any) => friend._id.toString());
 
         // Extract user IDs from sent friend requests
         const sentFriendReqIds = me?.sentFriendReq.map((req: any) => req.recipient.toString());
 
+        // Find all users except the current user and friends
+        const allUsers = await User.find({
+
+            $and: [
+                { _id: { $ne: userId } }, // Exclude self
+                { _id: { $nin: friendIds } }, // Exclude friends
+            ],
+        }).select("username email avatar");
+        //
+        //
+        //const allUsers = await User.find({
+        //    _id: { $ne: userId }, // Exclude self
+        //    _id: { $nin: friendIds }, // Exclude friends
+        //}).select("username email avatar");
+
+
+
+        // Extract user IDs from sent friend requests
+        //const sentFriendReqIds = me?.sentFriendReq.map((req: any) => req.recipient.toString());
+
         // Find all users except the current user
-        const allUsers = await User.find({ _id: { $ne: userId } }).select("username email avatar");
+        //const allUsers = await User.find({ _id: { $ne: userId } }).select("username email avatar");
 
         // Filter users into two categories
         const usersWithSentRequests = allUsers.filter(user => sentFriendReqIds?.includes(user._id.toString()));

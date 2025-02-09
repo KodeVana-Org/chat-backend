@@ -11,7 +11,6 @@ const me = asyncHandler(async (req: Request, res: Response): Promise<Response> =
 
         // Check if `userId` is provided
         const { userId } = req.body;
-
         if (userId) {
             // Fetch user by `userId`
             user = await User.findById(userId);
