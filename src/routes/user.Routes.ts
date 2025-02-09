@@ -5,7 +5,7 @@ import { Request, Response } from "express";
 import { me } from "../controllers/user/me";
 import { update_user_details } from "../controllers/user/update_user_details";
 import { upload } from "../config/multerConfig";
-import { setUserOffline, setUserOnline } from "../middlewares/userStatus.middware";
+//import { setUserOffline, setUserOnline } from "../middlewares/userStatus.middware";
 import { ApiResponse } from "../utils/ApiResponse";
 //import { redisClient } from "../config/redisConfig";
 import { searchAllUser } from "../controllers/user/searchUser";
@@ -34,21 +34,21 @@ router.route("/protected").get(verifyToken, (req: Request, res: Response) => {
 //<-- OFFLINE OR ONLINE --> \\
 //<--CHECK STATUS-->\\
 
-router.post("/online/:userId", async (req, res) => {
-    const { userId } = req.params;
-    await setUserOnline(userId)
-    return res
-        .status(200)
-        .json(new ApiResponse(200, {}, "user is now online"));
-})
+//router.post("/online/:userId", async (req, res) => {
+//    const { userId } = req.params;
+//    await setUserOnline(userId)
+//    return res
+//        .status(200)
+//        .json(new ApiResponse(200, {}, "user is now online"));
+//})
 
-router.post("/offline/:userId", async (req, res) => {
-    const { userId } = req.params;
-    await setUserOffline(userId)
-    return res
-        .status(200)
-        .json(new ApiResponse(200, {}, "user is offline now"))
-})
+//router.post("/offline/:userId", async (req, res) => {
+//    const { userId } = req.params;
+//    await setUserOffline(userId)
+//    return res
+//        .status(200)
+//        .json(new ApiResponse(200, {}, "user is offline now"))
+//})
 
 //<-- FOR FETCHING STATUS INDIVIDUAL -->\\
 //router.get("/user-status/:userId", async (req, res) => {

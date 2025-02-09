@@ -11,7 +11,7 @@ import messageRouter from "./routes/message.Routes"
 import { rateLimit } from "express-rate-limit";
 import requestIp from "request-ip";
 import { ApiError } from "./utils/ApiError";
-import { handleUserStatus } from "./socket/userStatusHandler";
+//import { handleUserStatus } from "./socket/userStatusHandler";
 import { errorHandler, notFoundHandler } from "./middlewares/routeChecker.middleware";
 
 const app = express();
@@ -82,6 +82,6 @@ app.use(notFoundHandler)
 // Error handling middleware (place it after all routes)
 app.use(errorHandler)
 
-handleUserStatus(io)
+//handleUserStatus(io)
 
 export { httpServer, io, app };
