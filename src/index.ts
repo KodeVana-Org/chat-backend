@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { User } from "./models/user.Model";
 import { connectToDatabase } from "./config/db";
 import { httpServer } from "./app";
-import { connectRedis } from "./config/redisConfig";
+//import { connectRedis } from "./config/redisConfig";
 import { io } from "./app";
 
 
@@ -20,7 +20,7 @@ const initSocket = () => {
         // Validate userId
         if (!userId || !mongoose.Types.ObjectId.isValid(userId as string)) {
             console.log("Invalid or missing User Id in query");
-            socket.disconnect(true);
+            //socket.disconnect(true);
             return;
         }
 
