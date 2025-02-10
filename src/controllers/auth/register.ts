@@ -15,6 +15,7 @@ import { sendOtp } from "../../services/sendEmail";
 const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
     try {
         const { email } = req.body;
+        console.log("email", email)
 
         /*
          * Lets check if the email is already registerd
@@ -52,7 +53,6 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
                     ),
                 );
         }
-        // NOTE: HERE SEND THE EMAIL
 
         //if email not exist that mean new user ,
         // new user  then save the mail and save the otp and send
@@ -118,7 +118,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
         user._id,
     );
     const loggedInUser = await User.findById(user._id).select(
-        "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+        "-password -sentFriendReq -incommingFriendReq -role -otp -googleId",
     );
     try {
         return res
@@ -128,14 +128,14 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
             .json(
                 new ApiResponse(
                     200,
-                    { user: loggedInUser, accessToken, refreshToken }, // send access and refresh token in response if client decides to save them by themselves
+                    { loggedInUser }, // send access and refresh token in response if client decides to save them by themselves
                     "User registerd  successfully",
                 ),
             );
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Error while login",
+            message: "Error while trying to register user",
         });
     }
 });
@@ -167,8 +167,9 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
         user._id,
     );
     const loggedInUser = await User.findById(user._id).select(
-        "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+        "-password -sentFriendReq -incommingFriendReq -role -otp -googleId",
     );
+
     try {
         return res
             .status(200)
@@ -177,7 +178,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
             .json(
                 new ApiResponse(
                     200,
-                    { user: loggedInUser, accessToken, refreshToken }, // send access and refresh token in response if client decides to save them by themselves
+                    { loggedInUser }, // send access and refresh token in response if client decides to save them by themselves
                     "User logged in successfully",
                 ),
             );
