@@ -83,5 +83,7 @@ app.use(notFoundHandler)
 app.use(errorHandler)
 
 //handleUserStatus(io)
+#DATABASE_URL=mongodb://mongodbserver:27017
+# sudo docker run -p 6969:6969 --network my-network --env-file .env tawk 
 
 export { httpServer, io, app };

@@ -28,3 +28,6 @@ This command compile the TypeScript files in the src folder and output the JavaS
 'node dist/index.js'
 
 NOW create the all folder and files
+    we can user this comand if we want to use any command before "npm run dev"
+    "predev":"sudo docker start mongodb",
+    "postdev":"sudo docker stop mongodb",

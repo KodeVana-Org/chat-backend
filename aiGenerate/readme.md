@@ -2,7 +2,7 @@
 * command: python -m venv venv
 
 # activate the envrionment
-* command: source venv/bin/activate
+ 1. command: source venv/bin/activate
 
 # Install dependencipes
 * command: pip install flask torch torchvision pillow
@@ -11,7 +11,7 @@
 
 
 # use this before running the server
-* export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/nix/store/ybjcla5bhj8g1y84998pn4a2drfxybkv-gcc-13.3.0-lib/lib
+  2. export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/nix/store/ybjcla5bhj8g1y84998pn4a2drfxybkv-gcc-13.3.0-lib/lib
 
 # run the server.py
 * python server.py

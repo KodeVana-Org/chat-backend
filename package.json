@@ -22,7 +22,9 @@
     "build": "tsc",
     "prestart": "npm run build",
     "start": "NODE_ENV=production node build/index.js",
-    "dev": "cross-env NODE_ENV=development NODE_OPTIONS='--no-warnings' nodemon -x ts-node src/index.ts"
+    "dev": "cross-env NODE_ENV=development NODE_OPTIONS='--no-warnings' nodemon -x ts-node src/index.ts",
+    "python-server": "cd aiGenerate && python server.py",
+    "both": "concurrently \"npm run dev\" \"npm run python-server\""
   },
   "keywords": [
     "node",
@@ -35,6 +37,7 @@
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cloudinary": "^1.41.3",
+    "concurrently": "^9.1.2",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
