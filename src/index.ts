@@ -10,6 +10,7 @@ import { io } from "./app";
 const initSocket = () => {
 
     console.log("Socket Initialized")
+
     io.on("connection", async (socket) => {
         console.log(`User connected: ${socket.id}`);
 
@@ -92,5 +93,3 @@ const startServer = () => {
         process.exit(1)
     }
 })()
-
-

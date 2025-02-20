@@ -1,15 +1,17 @@
-import express, { Request } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
-import env from "./config/dotenvConfig";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { rateLimit } from "express-rate-limit";
+import requestIp from "request-ip";
+
+import env from "./config/dotenvConfig";
 import authRouter from "./routes/auth.Routes";
 import userRouter from "./routes/user.Routes";
+import aiRoutes from "./routes/ai.Routes"
 import friendRouter from "./routes/friend.Routes";
 import conversationRouter from "./routes/conversation.Routes";
 import messageRouter from "./routes/message.Routes"
-import { rateLimit } from "express-rate-limit";
-import requestIp from "request-ip";
 import { ApiError } from "./utils/ApiError";
 //import { handleUserStatus } from "./socket/userStatusHandler";
 import { errorHandler, notFoundHandler } from "./middlewares/routeChecker.middleware";
@@ -27,22 +29,25 @@ app.use(requestIp.mw());
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5000, // Limit each IP to 5000 requests per windowMs
-    skipSuccessfulRequests: true, // Skip counting successful (status < 400) requests towards rate limiting
-    keyGenerator: async (req: Request) => {
-        // Using client IP as the rate limit key
-        const clientIp = (req.clientIp as string) || undefined;
+    max: 5000, // Limit each IP to 5000 requests per window
+    skipSuccessfulRequests: true, // Skip counting successful requests
+
+    keyGenerator: (req: Request): string => {
+        const clientIp = req.ip || req.headers["x-forwarded-for"] as string; // Get client IP
         if (!clientIp) {
-            throw new ApiError(500, "Unable to determine client IP ");
+            throw new ApiError(500, "Unable to determine client IP");
         }
         return clientIp;
     },
-    handler: (req, res, next, options) => {
-        throw new ApiError(
-            options.statusCode || 429, // 429 for Too Many Requests
-            `Too many requests. You are only allowed ${options.max} requests per ${options.windowMs / 60000} minutes.`,
+
+    handler: (req: Request, res: Response, next: NextFunction) => {
+        next(
+            new ApiError(
+                429, // Too Many Requests
+                `Too many requests. You are only allowed ${5000} requests per 15 minutes.`
+            )
         );
-    },
+    }
 });
 
 app.use(limiter);
@@ -75,6 +80,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/friend", friendRouter);
 app.use("/api/v1/conversation", conversationRouter);
 app.use("/api/v1/message", messageRouter);
+app.use("/api/v1", aiRoutes);
 
 // 404 handler for invalid routes
 app.use(notFoundHandler)
@@ -83,7 +89,5 @@ app.use(notFoundHandler)
 app.use(errorHandler)
 
 //handleUserStatus(io)
-#DATABASE_URL=mongodb://mongodbserver:27017
-# sudo docker run -p 6969:6969 --network my-network --env-file .env tawk 
 
 export { httpServer, io, app };
