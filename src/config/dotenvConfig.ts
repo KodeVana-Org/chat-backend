@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import { getEventListeners } from "events";
 dotenv.config();
 
 // interface for env variable
@@ -20,6 +21,8 @@ interface envVars {
     CLOUDINARY_API_SECRET: string
 
     GEMENI_API: string
+    //OPENAI_API: string
+    DEEPSEEK: string
 
 }
 
@@ -54,7 +57,10 @@ const env: envVars = {
     CLOUDINARY_CLOUD_NAME: getEnvVar("CLOUDINARY_CLOUD_NAME") as string,
     CLOUDINARY_API_SECRET: getEnvVar("CLOUDINARY_API_SECRET") as string,
     CLOUDINARY_API_KEY: getEnvVar("CLOUDINARY_API_KEY") as string,
-    GEMENI_API: getEnvVar("GEMENI_API") as string
+    GEMENI_API: getEnvVar("GEMENI_API") as string,
+    //OPENAI_API: getEnvVar("OPENAI_API") as string
+    //
+    DEEPSEEK: getEnvVar("DEEPSEEK") as string,
 };
 
 export default env;
