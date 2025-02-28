@@ -10,8 +10,6 @@ const router = Router();
 
 router.route("/upload").post(upload.single("image"), generate_avatar)
 router.route("/ai").post(generate_gemini_text)
-//router.route("/openai").post(openai_text)
-//router.route("/groke").post(grok2_text)
 router.route("/deep").post(openrouter_text)
 
 export default router;
