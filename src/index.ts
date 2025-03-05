@@ -6,6 +6,8 @@ import { httpServer } from "./app";
 //import { connectRedis } from "./config/redisConfig";
 import { io } from "./app";
 
+const users: any = {} //for audio call
+
 
 const initSocket = () => {
 
@@ -13,6 +15,7 @@ const initSocket = () => {
 
     io.on("connection", async (socket) => {
         console.log(`User connected: ${socket.id}`);
+
 
         //const userId = socket.handshake.auth?.userId || socket.handshake.query?.userId;
         const userId = socket.handshake.query?.userId;
